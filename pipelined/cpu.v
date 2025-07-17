@@ -61,7 +61,7 @@ wire [`WB_TO_ID_BUS_WIDTH - 1: 0] wb_to_id_bus;
 wire wb_allow_in;
 
 // IROM
-wire [31: 0] inst;
+wire [31: 0] irom_inst;
 
 // DRAM
 wire [31: 0] dram_rdo;
@@ -81,7 +81,7 @@ IF if_inst (
 ID id_inst(
        .clk(clk),
        .rst_n(rst_n),
-       .irom_inst(inst),
+       .irom_inst(irom_inst),
        .if_to_id_bus(if_to_id_bus),
        .ex_to_id_bus(ex_to_id_bus),
        .mem_to_id_bus(mem_to_id_bus),
@@ -137,13 +137,13 @@ WB wb_inst(
    );
 
 IROM #(
-         .IROM_FILE(IROM_FILE)
-     ) irom_inst(
+         .ROM_FILE(IROM_FILE)
+     ) irom_instance(
          .clk(clk),
          .irom_en(irom_en),
          .adr(irom_adr),
 
-         .inst(inst)
+         .inst(irom_inst)
      );
 
 DRAM dram_inst(
