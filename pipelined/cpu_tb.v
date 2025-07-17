@@ -33,7 +33,7 @@ begin
         #5 clk = ~clk;
 end
 
-// 实例化CPU，指定使用test.hex作为指令文件
+// 实例化CPU，指定使用 test.hex 作为指令文件
 cpu #(
         .IROM_FILE("test.hex")
     ) cpu_inst (
@@ -56,12 +56,6 @@ begin
     $finish;
 end
 
-// // 显示波形中的关键信号信息
-// initial begin
-//     $monitor("Time=%0t, PC=%h, Inst=%h, ALU=%h",
-//              $time, cpu_inst.pc, cpu_inst.inst, cpu_inst.alu_c);
-// end
-
 // 可选：监视寄存器状态
 // 每100个时间单位输出一次寄存器堆的值
 initial
@@ -81,38 +75,39 @@ begin
          $display("[数据] ALU结果=%h, wD=%h",
                   cpu_inst.ex_inst.alu_c,
                   cpu_inst.id_inst.wb_data);
-         $display("[流水线] IF_VALID=%b, ID_VALID=%b, EX_VALID=%b, MEM_VALID=%b, WB_VALID=%b",
+         $display("[流水线] IF_VALID=%b,    ID_VALID=%b,    EX_VALID=%b,    MEM_VALID=%b,    WB_VALID=%b",
                   cpu_inst.if_inst.if_valid,
                   cpu_inst.id_inst.id_valid,
                   cpu_inst.ex_inst.ex_valid,
                   cpu_inst.mem_inst.mem_valid,
                   cpu_inst.wb_inst.wb_valid);
-         $display("IF_READY_GO=%b, ID_READY_GO=%b, EX_READY_GO=%b, MEM_READY_GO=%b, WB_READY_GO=%b",
+         $display("[流水线] IF_READY_GO=%b, ID_READY_GO=%b, EX_READY_GO=%b, MEM_READY_GO=%b, WB_READY_GO=%b",
                   cpu_inst.if_inst.if_ready_go,
                   cpu_inst.id_inst.id_ready_go,
                   cpu_inst.ex_inst.ex_ready_go,
                   cpu_inst.mem_inst.mem_ready_go,
                   cpu_inst.wb_inst.wb_ready_go);
-         $display("rf_rd1_hazard=%b, rf_rd2_hazard=%b",
+         $display("[数据冒险] rf_rd1_hazard=%b, rf_rd2_hazard=%b",
                   cpu_inst.id_inst.rf_rd1_hazard,
                   cpu_inst.id_inst.rf_rd2_hazard);
-         $display("use_rf_rd1=%b, use_rf_rd2=%b",
+         $display("[数据冒险] use_rf_rd1=%b,    use_rf_rd2=%b",
                   cpu_inst.id_inst.use_rf_rd1,
                   cpu_inst.id_inst.use_rf_rd2);
-         $display("rd1_en=%b, rd2_en=%b",
+         $display("[数据冒险] rd1_en=%b,        rd2_en=%b",
                   cpu_inst.id_inst.rd1_en,
                   cpu_inst.id_inst.rd2_en);
-         $display("ex_rf_we=%b, mem_rf_we=%b, wb_rf_we=%b",
+         $display("[数据冒险] ex_rf_we=%b,  mem_rf_we=%b,  wb_rf_we=%b",
                   cpu_inst.id_inst.ex_rf_we,
                   cpu_inst.id_inst.mem_rf_we,
                   cpu_inst.id_inst.wb_rf_we);
-         $display("ex_wb_reg=%d, mem_wb_reg=%d, wb_wb_reg=%d",
+         $display("[数据冒险] ex_wb_reg=%d, mem_wb_reg=%d, wb_wb_reg=%d",
                   cpu_inst.id_inst.ex_wb_reg,
                   cpu_inst.id_inst.mem_wb_reg,
                   cpu_inst.id_inst.wb_wb_reg);
-         $display("rf_we_first=%b, EX.rf_we=%b",
+         $display("[数据冒险] rf_we_first=%b, EX.rf_we=%b",
                   cpu_inst.id_inst.rf_we_first,
                   cpu_inst.ex_inst.rf_we);
+
          $display("[寄存器] x0 =%h, x1 =%h, x2 =%h, x3 =%h, x4 =%h, x5 =%h, x6 =%h, x7 =%h",
                   cpu_inst.id_inst.rf_inst.regs[0],
                   cpu_inst.id_inst.rf_inst.regs[1],
@@ -163,4 +158,5 @@ begin
      $dumpfile("cpu_test.vcd");
      $dumpvars(0, cpu_tb);
  end
+
  endmodule

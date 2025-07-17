@@ -53,7 +53,7 @@ wire alu_a_sel;
 wire alu_b_sel;
 wire rd1_en;
 wire rd2_en;
-wire rf_we_first;
+wire id_rf_we;
 wire [1: 0] rf_wsel;
 wire is_load;
 
@@ -85,22 +85,22 @@ reg [31: 0] alu_a;
 reg [31: 0] alu_b;
 wire [31: 0] rD2_final;
 assign id_to_ex_bus = {  // 248 bits
-           npc_op,                                              // 2 bits
-           ram_we,                                              // 1 bit
-           ram_w_op,                                            // 2 bits
-           mem_ext_op,                                          // 3 bits
-           alu_op,                                              // 4 bits
-           alu_f_op,                                            // 3 bits
-           rf_we_first,                                         // 1 bit
-           rf_wsel,                                             // 2 bits
-           pc4,                                                 // 32 bits
-           pc,                                                  // 32 bits
-           ext,                                                 // 32 bits
-           rD1_final,                                                 // 32 bits
-           wb_reg_first,                                        // 5 bits
-           alu_a,                                               // 32 bits
-           alu_b,                                               // 32 bits
-           rD2_final,                                           // 32 bits
+           npc_op,                                               // 2 bits
+           ram_we,                                               // 1 bit
+           ram_w_op,                                             // 2 bits
+           mem_ext_op,                                           // 3 bits
+           alu_op,                                               // 4 bits
+           alu_f_op,                                             // 3 bits
+           id_rf_we,                                           // 1 bit
+           rf_wsel,                                              // 2 bits
+           pc4,                                                  // 32 bits
+           pc,                                                   // 32 bits
+           ext,                                                  // 32 bits
+           rD1_final,                                                  // 32 bits
+           wb_reg_first,                                         // 5 bits
+           alu_a,                                                // 32 bits
+           alu_b,                                                // 32 bits
+           rD2_final,                                            // 32 bits
            is_load           // 1 bit
        };
 
@@ -150,7 +150,7 @@ Controller controller_inst(
                .alu_b_sel(alu_b_sel),
                .rd1_en(rd1_en),
                .rd2_en(rd2_en),
-               .rf_we(rf_we_first),
+               .rf_we(id_rf_we),
                .rf_wsel(rf_wsel),
                .is_load(is_load)
            );

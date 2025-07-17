@@ -21,7 +21,7 @@
 
 
 module IROM #(
-           parameter ROM_FILE = "IROM.hex"
+           parameter IROM_FILE = "IROM.hex"
        )(
            input wire clk,
            input wire irom_en,

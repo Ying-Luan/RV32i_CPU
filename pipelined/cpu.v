@@ -137,7 +137,7 @@ WB wb_inst(
    );
 
 IROM #(
-         .ROM_FILE(IROM_FILE)
+         .IROM_FILE(IROM_FILE)
      ) irom_instance(
          .clk(clk),
          .irom_en(irom_en),
