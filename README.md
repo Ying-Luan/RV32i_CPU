@@ -1,6 +1,21 @@
 # RV32i CPU 单周期以及流水线实现
 
-基于 `Verilog` 语言实现
+基于 `Verilog` 语言实现，目前共支持 `miniRV` 的37条指令
+
+包括：
+
+* R 型指令 10 条  
+  `add`, `sub`, `and`, `or`, `xor`, `sll`, `srl`, `sra`, `slt`, `sltu`
+* I 型指令 15 条  
+  `addi`, `andi`, `ori`, `xori`, `slli`, `srli`, `srai`, `slti`, `sltiu`, `lb`, `lbu`, `lh`, `lhu`, `lw`, `jalr`
+* S 型指令 3 条  
+  `sb`, `sh`, `sw`
+* B 型指令 6 条  
+  `beq`, `bne`, `blt`, `bltu`, `bge`, `bgeu`
+* U 型指令 2 条  
+  `lui`, `auipc`
+* J 型指令 1 条  
+  `jal`
 
 ## 架构设计图
 
