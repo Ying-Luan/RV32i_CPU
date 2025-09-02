@@ -58,8 +58,10 @@ wire alu_b_sel;
 wire rd1_en;
 wire rd2_en;
 wire id_rf_we;
-wire [1: 0] rf_wsel;
+wire [2: 0] rf_wsel;
 wire is_load;
+wire csr_wdata_sel;
+wire invalid_instruction;  // TODO: wait for implement
 
 // input bus
 reg [`IF_TO_ID_BUS_WIDTH - 1: 0] id_regs;
@@ -88,24 +90,30 @@ wire [4: 0] wb_reg_first;
 reg [31: 0] alu_a;
 reg [31: 0] alu_b;
 wire [31: 0] rD2_final;
-assign id_to_ex_bus = {  // 248 bits
-           npc_op,                                                    // 2 bits
-           ram_we,                                                    // 1 bit
-           ram_w_op,                                                  // 2 bits
-           mem_ext_op,                                                // 3 bits
-           alu_op,                                                    // 4 bits
-           alu_f_op,                                                  // 3 bits
-           id_rf_we,                                                // 1 bit
-           rf_wsel,                                                   // 2 bits
-           pc4,                                                       // 32 bits
-           pc,                                                        // 32 bits
-           ext,                                                       // 32 bits
-           rD1_final,                                                       // 32 bits
-           wb_reg_first,                                              // 5 bits
-           alu_a,                                                     // 32 bits
-           alu_b,                                                     // 32 bits
-           rD2_final,                                                 // 32 bits
-           is_load           // 1 bit
+wire [11: 0] csr_addr;
+reg [31: 0] csr_wdata;
+wire [1: 0] csr_wdata_op;
+assign id_to_ex_bus = {  // 295 bits
+           npc_op,                                                     // 2 bits
+           ram_we,                                                     // 1 bit
+           ram_w_op,                                                   // 2 bits
+           mem_ext_op,                                                 // 3 bits
+           alu_op,                                                     // 4 bits
+           alu_f_op,                                                   // 3 bits
+           id_rf_we,                                                 // 1 bit
+           rf_wsel,                                                    // 3 bits
+           pc4,                                                        // 32 bits
+           pc,                                                         // 32 bits
+           ext,                                                        // 32 bits
+           rD1_final,                                                        // 32 bits
+           wb_reg_first,                                               // 5 bits
+           alu_a,                                                      // 32 bits
+           alu_b,                                                      // 32 bits
+           rD2_final,                                                  // 32 bits
+           is_load,            // 1 bit
+           csr_addr,          // 12 bits
+           csr_wdata,          // 32 bits
+           csr_wdata_op       // 2 bits
        };
 
 // pipeline control
@@ -156,7 +164,10 @@ controller controller_inst(
                .rd2_en(rd2_en),
                .rf_we(id_rf_we),
                .rf_wsel(rf_wsel),
-               .is_load(is_load)
+               .is_load(is_load),
+               .csr_wdata_sel(csr_wdata_sel),
+               .csr_wdata_op(csr_wdata_op),
+               .invalid_instruction(invalid_instruction)
            );
 
 // RF
@@ -209,6 +220,19 @@ begin
             alu_b = ext;
         default:
             alu_b = 32'b0;
+    endcase
+end
+
+// csr
+always @( * )
+begin
+    case (csr_wdata_sel)
+        `CSR_WDATA_SEL_RS1:
+            csr_wdata = rD1_final;
+        `CSR_WDATA_SEL_IMM:
+            csr_wdata = {27'b0, inst[19: 15]};
+        default:
+            csr_wdata = 32'b0;
     endcase
 end
 

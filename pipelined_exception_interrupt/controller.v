@@ -46,8 +46,8 @@ module controller(
            output reg [2: 0] rf_wsel,
            output reg is_load,
            // csr
-           output reg [1: 0] csr_wdata_op,
            output reg csr_wdata_sel,
+           output reg [1: 0] csr_wdata_op,
            // exception
            output reg invalid_instruction
        );
