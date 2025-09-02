@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module CSR (
+module csr (
            input wire clk,
            input wire rst_n
        );

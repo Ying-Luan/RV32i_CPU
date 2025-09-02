@@ -21,7 +21,7 @@
 
 `include "defines.v"
 
-module EX (
+module ex_stage (
            input wire clk,
            input wire rst_n,
            input wire [`ID_TO_EX_BUS_WIDTH - 1: 0] id_to_ex_bus,
@@ -96,12 +96,12 @@ assign ex_to_if_bus = {br_target, br_taken};  // 33 bits
 
 wire [31: 0] alu_c;
 assign ex_to_mem_bus = {  // 107 bits
-           mem_ext_op,                                                       // 3 bits
-           rf_we,                                                            // 1 bit
-           rf_wsel,                                                          // 2 bits
-           pc4,                                                              // 32 bits
-           ext,                                                              // 32 bits
-           wb_reg,                                                           // 5 bits
+           mem_ext_op,                                                         // 3 bits
+           rf_we,                                                              // 1 bit
+           rf_wsel,                                                            // 2 bits
+           pc4,                                                                // 32 bits
+           ext,                                                                // 32 bits
+           wb_reg,                                                             // 5 bits
            alu_c                          // 32 bits
        };
 
@@ -145,7 +145,7 @@ begin
     endcase
 end
 
-ALU alu_inst (
+alu alu_inst (
         .op(alu_op),
         .f_op(alu_f_op),
         .A(alu_a),
@@ -177,11 +177,11 @@ begin
     endcase
 end
 assign ex_to_id_bus = {  // 41 bits
-           ex_valid,                                   // 1 bit
-           rf_we,                                      // 1 bit
-           wb_reg,                                     // 5 bits
-           rf_wdata,                                   // 32 bits
-           is_load,                                    // 1 bit
+           ex_valid,                                     // 1 bit
+           rf_we,                                        // 1 bit
+           wb_reg,                                       // 5 bits
+           rf_wdata,                                     // 32 bits
+           is_load,                                      // 1 bit
            br_taken                             // 1 bit
        };
 

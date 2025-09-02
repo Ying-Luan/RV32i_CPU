@@ -21,13 +21,17 @@
 
 `include "defines.v"
 
-module ID(
+module id_stage(
            input wire clk,
            input wire rst_n,
            input wire [31: 0] irom_inst,
+           // from if_stage
            input wire [ `IF_TO_ID_BUS_WIDTH - 1: 0] if_to_id_bus,
+           // from ex_stage
            input wire [ `EX_TO_ID_BUS_WIDTH - 1: 0] ex_to_id_bus,
+           // from mem_stage
            input wire [`MEM_TO_ID_BUS_WIDTH - 1: 0] mem_to_id_bus,
+           // from wb_stage
            input wire [ `WB_TO_ID_BUS_WIDTH - 1: 0] wb_to_id_bus,
            input wire if_to_id_valid,
            input wire ex_allow_in,
@@ -85,22 +89,22 @@ reg [31: 0] alu_a;
 reg [31: 0] alu_b;
 wire [31: 0] rD2_final;
 assign id_to_ex_bus = {  // 248 bits
-           npc_op,                                               // 2 bits
-           ram_we,                                               // 1 bit
-           ram_w_op,                                             // 2 bits
-           mem_ext_op,                                           // 3 bits
-           alu_op,                                               // 4 bits
-           alu_f_op,                                             // 3 bits
-           id_rf_we,                                           // 1 bit
-           rf_wsel,                                              // 2 bits
-           pc4,                                                  // 32 bits
-           pc,                                                   // 32 bits
-           ext,                                                  // 32 bits
-           rD1_final,                                                  // 32 bits
-           wb_reg_first,                                         // 5 bits
-           alu_a,                                                // 32 bits
-           alu_b,                                                // 32 bits
-           rD2_final,                                            // 32 bits
+           npc_op,                                                    // 2 bits
+           ram_we,                                                    // 1 bit
+           ram_w_op,                                                  // 2 bits
+           mem_ext_op,                                                // 3 bits
+           alu_op,                                                    // 4 bits
+           alu_f_op,                                                  // 3 bits
+           id_rf_we,                                                // 1 bit
+           rf_wsel,                                                   // 2 bits
+           pc4,                                                       // 32 bits
+           pc,                                                        // 32 bits
+           ext,                                                       // 32 bits
+           rD1_final,                                                       // 32 bits
+           wb_reg_first,                                              // 5 bits
+           alu_a,                                                     // 32 bits
+           alu_b,                                                     // 32 bits
+           rD2_final,                                                 // 32 bits
            is_load           // 1 bit
        };
 
@@ -133,8 +137,8 @@ end
 
 assign wb_reg_first = inst[11: 7];
 
-// Controller
-Controller controller_inst(
+// controller
+controller controller_inst(
                .opcode(inst[6: 0]),
                .funct3(inst[14: 12]),
                .funct7(inst[31: 25]),
@@ -162,7 +166,7 @@ assign rR1 = inst[19: 15];
 assign rR2 = inst[24: 20];
 wire [31: 0] rD1;
 wire [31: 0] rD2;
-RF rf_inst(
+rf rf_inst(
        .clk(clk),
        .rR1(rR1),
        .rR2(rR2),
@@ -174,15 +178,15 @@ RF rf_inst(
        .rD2(rD2)
    );
 
-// SEXT
-SEXT sext_inst(
+// sext
+sext sext_inst(
          .op(sext_op),
          .din(inst),
 
          .ext(ext)
      );
 
-// ALU_a
+// alu_a
 always @( * )
 begin
     case (alu_a_sel)
@@ -195,7 +199,7 @@ begin
     endcase
 end
 
-// ALU_b
+// alu_b
 always @( * )
 begin
     case (alu_b_sel)

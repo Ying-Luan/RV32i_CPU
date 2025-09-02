@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module IROM #(
+module irom #(
            parameter IROM_FILE = "IROM.hex"
        )(
            input wire clk,

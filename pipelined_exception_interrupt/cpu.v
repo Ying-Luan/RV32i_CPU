@@ -66,77 +66,77 @@ wire [31: 0] irom_inst;
 // DRAM
 wire [31: 0] dram_rdo;
 
-IF if_inst (
-       .clk(clk),
-       .rst_n(rst_n),
-       .ex_to_if_bus(ex_to_if_bus),
-       .id_allow_in(id_allow_in),
+if_stage if_stage_inst (
+             .clk(clk),
+             .rst_n(rst_n),
+             .ex_to_if_bus(ex_to_if_bus),
+             .id_allow_in(id_allow_in),
 
-       .irom_adr(irom_adr),
-       .irom_en(irom_en),
-       .if_to_id_bus(if_to_id_bus),
-       .if_to_id_valid(if_to_id_valid)
-   );
+             .irom_adr(irom_adr),
+             .irom_en(irom_en),
+             .if_to_id_bus(if_to_id_bus),
+             .if_to_id_valid(if_to_id_valid)
+         );
 
-ID id_inst(
-       .clk(clk),
-       .rst_n(rst_n),
-       .irom_inst(irom_inst),
-       .if_to_id_bus(if_to_id_bus),
-       .ex_to_id_bus(ex_to_id_bus),
-       .mem_to_id_bus(mem_to_id_bus),
-       .wb_to_id_bus(wb_to_id_bus),
-       .if_to_id_valid(if_to_id_valid),
-       .ex_allow_in(ex_allow_in),
+id_stage id_stage_inst(
+             .clk(clk),
+             .rst_n(rst_n),
+             .irom_inst(irom_inst),
+             .if_to_id_bus(if_to_id_bus),
+             .ex_to_id_bus(ex_to_id_bus),
+             .mem_to_id_bus(mem_to_id_bus),
+             .wb_to_id_bus(wb_to_id_bus),
+             .if_to_id_valid(if_to_id_valid),
+             .ex_allow_in(ex_allow_in),
 
-       .id_to_ex_bus(id_to_ex_bus),
-       .id_allow_in(id_allow_in),
-       .id_to_ex_valid(id_to_ex_valid)
-   );
+             .id_to_ex_bus(id_to_ex_bus),
+             .id_allow_in(id_allow_in),
+             .id_to_ex_valid(id_to_ex_valid)
+         );
 
-EX ex_inst(
-       .clk(clk),
-       .rst_n(rst_n),
-       .id_to_ex_bus(id_to_ex_bus),
-       .id_to_ex_valid(id_to_ex_valid),
-       .mem_allow_in(mem_allow_in),
+ex_stage ex_stage_inst(
+             .clk(clk),
+             .rst_n(rst_n),
+             .id_to_ex_bus(id_to_ex_bus),
+             .id_to_ex_valid(id_to_ex_valid),
+             .mem_allow_in(mem_allow_in),
 
-       .dram_adr(dram_adr),
-       .dram_w_op(dram_w_op),
-       .dram_we(dram_we),
-       .dram_wdin(dram_wdin),
-       .ex_to_if_bus(ex_to_if_bus),
-       .ex_to_id_bus(ex_to_id_bus),
-       .ex_to_mem_bus(ex_to_mem_bus),
-       .ex_allow_in(ex_allow_in),
-       .ex_to_mem_valid(ex_to_mem_valid)
-   );
+             .dram_adr(dram_adr),
+             .dram_w_op(dram_w_op),
+             .dram_we(dram_we),
+             .dram_wdin(dram_wdin),
+             .ex_to_if_bus(ex_to_if_bus),
+             .ex_to_id_bus(ex_to_id_bus),
+             .ex_to_mem_bus(ex_to_mem_bus),
+             .ex_allow_in(ex_allow_in),
+             .ex_to_mem_valid(ex_to_mem_valid)
+         );
 
-MEM mem_inst(
-        .clk(clk),
-        .rst_n(rst_n),
-        .dram_rdo(dram_rdo),
-        .ex_to_mem_bus(ex_to_mem_bus),
-        .ex_to_mem_valid(ex_to_mem_valid),
-        .wb_allow_in(wb_allow_in),
+mem_stage mem_stage_inst(
+              .clk(clk),
+              .rst_n(rst_n),
+              .dram_rdo(dram_rdo),
+              .ex_to_mem_bus(ex_to_mem_bus),
+              .ex_to_mem_valid(ex_to_mem_valid),
+              .wb_allow_in(wb_allow_in),
 
-        .mem_to_id_bus(mem_to_id_bus),
-        .mem_to_wb_bus(mem_to_wb_bus),
-        .mem_allow_in(mem_allow_in),
-        .mem_to_wb_valid(mem_to_wb_valid)
-    );
+              .mem_to_id_bus(mem_to_id_bus),
+              .mem_to_wb_bus(mem_to_wb_bus),
+              .mem_allow_in(mem_allow_in),
+              .mem_to_wb_valid(mem_to_wb_valid)
+          );
 
-WB wb_inst(
-       .clk(clk),
-       .rst_n(rst_n),
-       .mem_to_wb_bus(mem_to_wb_bus),
-       .mem_to_wb_valid(mem_to_wb_valid),
+wb_stage wb_stage_inst(
+             .clk(clk),
+             .rst_n(rst_n),
+             .mem_to_wb_bus(mem_to_wb_bus),
+             .mem_to_wb_valid(mem_to_wb_valid),
 
-       .wb_to_id_bus(wb_to_id_bus),
-       .wb_allow_in(wb_allow_in)
-   );
+             .wb_to_id_bus(wb_to_id_bus),
+             .wb_allow_in(wb_allow_in)
+         );
 
-IROM #(
+irom #(
          .IROM_FILE(IROM_FILE)
      ) irom_instance(
          .clk(clk),
@@ -146,7 +146,7 @@ IROM #(
          .inst(irom_inst)
      );
 
-DRAM dram_inst(
+dram dram_inst(
          .clk(clk),
          .adr(dram_adr),
          .op(dram_w_op),

@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module PC(
+module pc(
            input wire clk,
            input wire rst_n,
            input wire [31: 0] din,

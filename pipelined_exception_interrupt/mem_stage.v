@@ -21,7 +21,7 @@
 
 `include "defines.v"
 
-module MEM(
+module mem_stage(
            input wire clk,
            input wire rst_n,
            input wire [31: 0] dram_rdo,
@@ -67,8 +67,8 @@ assign {
 // output bus
 reg [31: 0] wb_data;
 assign mem_to_wb_bus = {  // 38 bits
-           rf_we,                               // 1 bit
-           wb_reg,                              // 5 bits
+           rf_we,                                 // 1 bit
+           wb_reg,                                // 5 bits
            wb_data      // 32 bits
        };
 
@@ -92,7 +92,7 @@ begin
     end
 end
 
-MEM_EXT mem_ext_inst (
+mem_ext mem_ext_inst (
             .op(mem_ext_op),
             .din(dram_rdo),
 
@@ -116,9 +116,9 @@ end
 
 // bypass
 assign mem_to_id_bus = {  // 39 bits
-           mem_valid,           // 1 bit
-           rf_we,              // 1 bit
-           wb_reg,          // 5 bits
+           mem_valid,             // 1 bit
+           rf_we,                // 1 bit
+           wb_reg,            // 5 bits
            wb_data      // 32 bits
        };
 

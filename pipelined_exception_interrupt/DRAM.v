@@ -21,7 +21,7 @@
 
 `include "defines.v"
 
-module DRAM(
+module dram(
            input wire clk,
            input wire [31: 0] adr,
            input wire [1: 0] op,

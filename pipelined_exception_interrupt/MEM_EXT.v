@@ -21,7 +21,7 @@
 
 `include "defines.v"
 
-module MEM_EXT(
+module mem_ext(
            input wire [2: 0] op,
            input wire [31: 0] din,
 

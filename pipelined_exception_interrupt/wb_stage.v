@@ -21,7 +21,7 @@
 
 `include "defines.v"
 
-module WB(
+module wb_stage(
            input wire clk,
            input wire rst_n,
            input wire [`MEM_TO_WB_BUS_WIDTH - 1: 0] mem_to_wb_bus,

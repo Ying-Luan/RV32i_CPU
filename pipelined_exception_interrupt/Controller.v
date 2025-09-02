@@ -21,7 +21,7 @@
 
 `include "defines.v"
 
-module Controller(
+module controller(
            input wire [6: 0] opcode,
            input wire [2: 0] funct3,
            input wire [6: 0] funct7,
@@ -44,7 +44,9 @@ module Controller(
            // rf
            output reg rf_we,
            output reg [1: 0] rf_wsel,
-           output reg is_load
+           output reg is_load,
+           // exception
+           output reg invalid_instruction
        );
 
 always @( * )
@@ -64,6 +66,7 @@ begin
     rf_we = `CLOSE;
     rf_wsel = `WB_ALU;
     is_load = `CLOSE;
+    invalid_instruction = `FALSE;
 
     case (opcode)
         7'b0110011:
@@ -108,6 +111,8 @@ begin
                     alu_op = `ALU_SLT;
                 3'b011:
                     alu_op = `ALU_SLTU;
+                default:
+                    invalid_instruction = `TRUE;
             endcase
         end
         7'b0010011:
@@ -146,6 +151,8 @@ begin
                     alu_op = `ALU_SLT;
                 3'b011:
                     alu_op = `ALU_SLTU;
+                default:
+                    invalid_instruction = `TRUE;
             endcase
         end
         7'b0000011:
@@ -173,6 +180,8 @@ begin
                     mem_ext_op = `MEM_EXT_HU;
                 3'b010:
                     mem_ext_op = `MEM_EXT_W;
+                default:
+                    invalid_instruction = `TRUE;
             endcase
         end
         7'b1100111:
@@ -204,6 +213,8 @@ begin
                     ram_w_op = `W_H;
                 3'b010:
                     ram_w_op = `W_W;
+                default:
+                    invalid_instruction = `TRUE;
             endcase
         end
         7'b1100011:
@@ -230,6 +241,8 @@ begin
                     alu_f_op = `F_BGE;
                 3'b111:
                     alu_f_op = `F_BGEU;
+                default:
+                    invalid_instruction = `TRUE;
             endcase
         end
         7'b0110111:

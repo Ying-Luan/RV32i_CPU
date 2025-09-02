@@ -21,7 +21,7 @@
 
 `include "defines.v"
 
-module ALU(
+module alu(
            input wire [3: 0] op,
            input wire [2: 0] f_op,
            input wire [31: 0] A,

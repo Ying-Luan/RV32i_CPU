@@ -21,7 +21,7 @@
 
 `include "defines.v"
 
-module SEXT(
+module sext(
            input wire [2: 0] op,
            input wire [31: 0] din,
 

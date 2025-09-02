@@ -26,6 +26,9 @@
 `define ENABLE  1'b1
 `define DISABLE 1'b0
 
+`define TRUE   1'b1
+`define FALSE  1'b0
+
 // npc_op
 `define NPC_PC4  2'b00
 `define NPC_BRA  2'b01

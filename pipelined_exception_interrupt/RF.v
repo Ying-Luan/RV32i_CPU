@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module RF(
+module rf(
            input wire clk,
            input wire [4: 0] rR1,
            input wire [4: 0] rR2,

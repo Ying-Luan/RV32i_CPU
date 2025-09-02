@@ -21,7 +21,7 @@
 
 `include "defines.v"
 
-module IF(
+module if_stage(
            input wire clk,
            input wire rst_n,
            input wire [`EX_TO_IF_BUS_WIDTH - 1: 0] ex_to_if_bus,
@@ -72,7 +72,7 @@ end
 wire [31: 0] pc_din;
 assign pc_din = br_taken ? br_target : pc4;
 
-PC pc_inst(
+pc pc_inst(
        .clk(clk),
        .rst_n(rst_n),
        .din(pc_din),
