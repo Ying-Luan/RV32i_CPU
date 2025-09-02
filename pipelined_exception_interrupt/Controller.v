@@ -43,8 +43,11 @@ module controller(
            output reg rd2_en,
            // rf
            output reg rf_we,
-           output reg [1: 0] rf_wsel,
+           output reg [2: 0] rf_wsel,
            output reg is_load,
+           // csr
+           output reg [1: 0] csr_wdata_op,
+           output reg csr_wdata_sel,
            // exception
            output reg invalid_instruction
        );
@@ -66,6 +69,8 @@ begin
     rf_we = `CLOSE;
     rf_wsel = `WB_ALU;
     is_load = `CLOSE;
+    csr_wdata_sel = `CSR_WDATA_SEL_RS1;
+    csr_wdata_op = `CSR_WDATA_OP_NOP;
     invalid_instruction = `FALSE;
 
     case (opcode)
@@ -194,6 +199,45 @@ begin
             rd2_en = `DISABLE;
             ram_we = `CLOSE;
         end
+        7'b1110011:
+        begin  // I-type csr
+            rf_we = `OPEN;
+            rf_wsel = `WB_CSR;
+            case (funct3)
+                3'b001:
+                begin
+                    csr_wdata_sel = `CSR_WDATA_SEL_RS1;
+                    csr_wdata_op = `CSR_WDATA_OP_NOP;
+                end
+                3'b010:
+                begin
+                    csr_wdata_sel = `CSR_WDATA_SEL_RS1;
+                    csr_wdata_op = `CSR_WDATA_OP_OR;
+                end
+                3'b011:
+                begin
+                    csr_wdata_sel = `CSR_WDATA_SEL_RS1;
+                    csr_wdata_op = `CSR_WDATA_OP_ANDN;
+                end
+                3'b101:
+                begin
+                    csr_wdata_sel = `CSR_WDATA_SEL_IMM;
+                    csr_wdata_op = `CSR_WDATA_OP_NOP;
+                end
+                3'b110:
+                begin
+                    csr_wdata_sel = `CSR_WDATA_SEL_IMM;
+                    csr_wdata_op = `CSR_WDATA_OP_OR;
+                end
+                3'b111:
+                begin
+                    csr_wdata_sel = `CSR_WDATA_SEL_IMM;
+                    csr_wdata_op = `CSR_WDATA_OP_ANDN;
+                end
+                default:
+                    invalid_instruction = `TRUE;
+            endcase
+        end
         7'b0100011:
         begin  // S-type
             npc_op = `NPC_PC4;
@@ -272,6 +316,8 @@ begin
             sext_op = `EXT_J;
             ram_we = `CLOSE;
         end
+        default:
+            invalid_instruction = `TRUE;
     endcase
 end
 endmodule

@@ -35,11 +35,21 @@
 `define NPC_JAL  2'b10
 `define NPC_JALR 2'b11
 
-// rf_wsel
-`define WB_ALU 2'b00
-`define WB_EXT 2'b01
-`define WB_PC4 2'b10
-`define WB_MEM 2'b11
+// rf_wsel 3 bits
+`define WB_ALU 3'b000
+`define WB_EXT 3'b001
+`define WB_PC4 3'b010
+`define WB_MEM 3'b011
+`define WB_CSR 3'b100
+
+// csr_wdata_sel
+`define CSR_WDATA_SEL_RS1 1'b0
+`define CSR_WDATA_SEL_IMM 1'b1
+
+// csr_wdata_op
+`define CSR_WDATA_OP_NOP  2'b00
+`define CSR_WDATA_OP_OR   2'b01
+`define CSR_WDATA_OP_ANDN 2'b10
 
 // sext_op
 `define EXT_I 3'b000
