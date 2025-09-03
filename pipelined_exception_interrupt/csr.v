@@ -7,10 +7,10 @@ module csr (
            input wire clk,
            input wire rst_n,
            // from id_stage
-           input wire [11: 0] csr_raddr,
+           input wire [`CSR_ADDRESS_WIDTH - 1: 0] csr_raddr,
            // from ex_stage
            input wire csr_we,
-           input wire [11: 0] csr_waddr,
+           input wire [`CSR_ADDRESS_WIDTH - 1: 0] csr_waddr,
            input wire [31: 0] csr_wdata,
 
            // output

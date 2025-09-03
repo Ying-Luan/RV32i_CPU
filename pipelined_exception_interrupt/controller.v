@@ -27,28 +27,28 @@ module controller(
            input wire [6: 0] funct7,
 
            // sext
-           output reg [2: 0] sext_op,
+           output reg [`SEXT_OP_WIDTH - 1: 0] sext_op,
            // npc
-           output reg [1: 0] npc_op,
+           output reg [`NPC_OP_WIDTH - 1: 0] npc_op,
            // ram
            output reg ram_we,
-           output reg [1: 0] ram_w_op,
-           output reg [2: 0] mem_ext_op,
+           output reg [`RAM_W_OP_WIDTH - 1: 0] ram_w_op,
+           output reg [`MEM_EXT_OP_WIDTH - 1: 0] mem_ext_op,
            // alu
-           output reg [3: 0] alu_op,
-           output reg [2: 0] alu_f_op,
+           output reg [`ALU_OP_WIDTH - 1: 0] alu_op,
+           output reg [`ALU_F_OP_WIDTH - 1: 0] alu_f_op,
            output reg alu_a_sel,
            output reg alu_b_sel,
            output reg rd1_en,
            output reg rd2_en,
            // rf
            output reg rf_we,
-           output reg [2: 0] rf_wsel,
+           output reg [ `RF_WSEL_WIDTH - 1: 0] rf_wsel,
            output reg is_load,
            // csr
            output reg csr_we,
            output reg csr_wdata_sel,
-           output reg [1: 0] csr_wdata_op,
+           output reg [`CSR_WDATA_OP_WIDTH - 1: 0] csr_wdata_op,
            // exception
            output reg invalid_instruction
        );
