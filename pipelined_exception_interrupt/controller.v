@@ -46,6 +46,7 @@ module controller(
            output reg [2: 0] rf_wsel,
            output reg is_load,
            // csr
+           output reg csr_we,
            output reg csr_wdata_sel,
            output reg [1: 0] csr_wdata_op,
            // exception
@@ -69,6 +70,7 @@ begin
     rf_we = `CLOSE;
     rf_wsel = `WB_ALU;
     is_load = `CLOSE;
+    csr_we = `FALSE;
     csr_wdata_sel = `CSR_WDATA_SEL_RS1;
     csr_wdata_op = `CSR_WDATA_OP_NOP;
     invalid_instruction = `FALSE;
@@ -203,6 +205,7 @@ begin
         begin  // I-type csr
             rf_we = `OPEN;
             rf_wsel = `WB_CSR;
+            csr_we = `TRUE;
             case (funct3)
                 3'b001:
                 begin

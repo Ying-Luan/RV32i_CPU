@@ -33,10 +33,14 @@ module id_stage(
            input wire [`MEM_TO_ID_BUS_WIDTH - 1: 0] mem_to_id_bus,
            // from wb_stage
            input wire [ `WB_TO_ID_BUS_WIDTH - 1: 0] wb_to_id_bus,
+           // from csr
+           input wire [31: 0] csr_rdata,
            input wire if_to_id_valid,
            input wire ex_allow_in,
 
            output wire [`ID_TO_EX_BUS_WIDTH - 1: 0] id_to_ex_bus,
+           // to csr
+           output wire [11: 0] csr_raddr,
            output wire id_allow_in,
            output wire id_to_ex_valid
        );
@@ -60,6 +64,7 @@ wire rd2_en;
 wire id_rf_we;
 wire [2: 0] rf_wsel;
 wire is_load;
+wire csr_we;
 wire csr_wdata_sel;
 wire invalid_instruction;  // TODO: wait for implement
 
@@ -90,29 +95,32 @@ wire [4: 0] wb_reg_first;
 reg [31: 0] alu_a;
 reg [31: 0] alu_b;
 wire [31: 0] rD2_final;
-wire [11: 0] csr_addr;
+wire [11: 0] csr_waddr;
 reg [31: 0] csr_wdata;
 wire [1: 0] csr_wdata_op;
-assign id_to_ex_bus = {  // 295 bits
-           npc_op,                                                     // 2 bits
-           ram_we,                                                     // 1 bit
-           ram_w_op,                                                   // 2 bits
-           mem_ext_op,                                                 // 3 bits
-           alu_op,                                                     // 4 bits
-           alu_f_op,                                                   // 3 bits
-           id_rf_we,                                                 // 1 bit
-           rf_wsel,                                                    // 3 bits
-           pc4,                                                        // 32 bits
-           pc,                                                         // 32 bits
-           ext,                                                        // 32 bits
-           rD1_final,                                                        // 32 bits
-           wb_reg_first,                                               // 5 bits
-           alu_a,                                                      // 32 bits
-           alu_b,                                                      // 32 bits
-           rD2_final,                                                  // 32 bits
-           is_load,            // 1 bit
-           csr_addr,          // 12 bits
-           csr_wdata,          // 32 bits
+assign id_to_ex_bus = {  // 328 bits
+           npc_op,                                                         // 2 bits
+           ram_we,                                                         // 1 bit
+           ram_w_op,                                                       // 2 bits
+           mem_ext_op,                                                     // 3 bits
+           alu_op,                                                         // 4 bits
+           alu_f_op,                                                       // 3 bits
+           id_rf_we,                                                     // 1 bit
+           rf_wsel,                                                        // 3 bits
+           pc4,                                                            // 32 bits
+           pc,                                                             // 32 bits
+           ext,                                                            // 32 bits
+           rD1_final,                                                            // 32 bits
+           wb_reg_first,                                                   // 5 bits
+           alu_a,                                                          // 32 bits
+           alu_b,                                                          // 32 bits
+           rD2_final,                                                      // 32 bits
+           is_load,                // 1 bit
+           // csr
+           csr_rdata,              // 32 bits
+           csr_we,                  // 1 bit
+           csr_waddr,              // 12 bits
+           csr_wdata,              // 32 bits
            csr_wdata_op       // 2 bits
        };
 
@@ -165,6 +173,7 @@ controller controller_inst(
                .rf_we(id_rf_we),
                .rf_wsel(rf_wsel),
                .is_load(is_load),
+               .csr_we(csr_we),
                .csr_wdata_sel(csr_wdata_sel),
                .csr_wdata_op(csr_wdata_op),
                .invalid_instruction(invalid_instruction)
@@ -224,6 +233,8 @@ begin
 end
 
 // csr
+assign csr_raddr = inst[31: 20];
+assign csr_waddr = inst[31: 20];
 always @( * )
 begin
     case (csr_wdata_sel)

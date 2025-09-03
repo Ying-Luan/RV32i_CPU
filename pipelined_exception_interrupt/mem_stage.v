@@ -54,6 +54,7 @@ wire [31: 0] pc4;
 wire [31: 0] ext;
 wire [4: 0] wb_reg;
 wire [31: 0] alu_c;
+wire [31: 0] csr_rdata;
 assign {
         mem_ext_op,
         rf_we,
@@ -61,14 +62,16 @@ assign {
         pc4,
         ext,
         wb_reg,
-        alu_c
+        alu_c,
+        // csr
+        csr_rdata
     } = mem_regs;
 
 // output bus
 reg [31: 0] wb_data;
 assign mem_to_wb_bus = {  // 38 bits
-           rf_we,                                 // 1 bit
-           wb_reg,                                // 5 bits
+           rf_we,                                  // 1 bit
+           wb_reg,                                 // 5 bits
            wb_data      // 32 bits
        };
 
@@ -111,14 +114,18 @@ begin
             wb_data = pc4;
         `WB_MEM:
             wb_data = mem_dout;
+        `WB_CSR:
+            wb_data = csr_rdata;
+        default:
+            wb_data = 32'b0;
     endcase
 end
 
 // bypass
 assign mem_to_id_bus = {  // 39 bits
-           mem_valid,             // 1 bit
-           rf_we,                // 1 bit
-           wb_reg,            // 5 bits
+           mem_valid,              // 1 bit
+           rf_we,                 // 1 bit
+           wb_reg,             // 5 bits
            wb_data      // 32 bits
        };
 

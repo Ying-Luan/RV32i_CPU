@@ -28,18 +28,19 @@ module cpu #(
            input wire rst_n
        );
 
-// IF
+// if_stage
 wire [31: 0] irom_adr;
 wire irom_en;
 wire [`IF_TO_ID_BUS_WIDTH - 1: 0] if_to_id_bus;
 wire if_to_id_valid;
 
-// ID
+// id_stage
 wire [`ID_TO_EX_BUS_WIDTH - 1: 0] id_to_ex_bus;
+wire [11: 0] csr_raddr;
 wire id_allow_in;
 wire id_to_ex_valid;
 
-// EX
+// ex_stage
 wire [31: 0] dram_adr;
 wire [1: 0] dram_w_op;
 wire dram_we;
@@ -47,18 +48,24 @@ wire [31: 0] dram_wdin;
 wire [`EX_TO_IF_BUS_WIDTH - 1: 0] ex_to_if_bus;
 wire [`EX_TO_ID_BUS_WIDTH - 1: 0] ex_to_id_bus;
 wire [`EX_TO_MEM_BUS_WIDTH - 1: 0] ex_to_mem_bus;
+wire csr_we;
+wire [11: 0] csr_waddr;
+wire [31: 0] csr_wdata;
 wire ex_allow_in;
 wire ex_to_mem_valid;
 
-// MEM
+// mem_stage
 wire [`MEM_TO_ID_BUS_WIDTH - 1: 0] mem_to_id_bus;
 wire [`MEM_TO_WB_BUS_WIDTH - 1: 0] mem_to_wb_bus;
 wire mem_allow_in;
 wire mem_to_wb_valid;
 
-// WB
+// wb_stage
 wire [`WB_TO_ID_BUS_WIDTH - 1: 0] wb_to_id_bus;
 wire wb_allow_in;
+
+// csr
+wire [31: 0] csr_rdata;
 
 // IROM
 wire [31: 0] irom_inst;
@@ -86,21 +93,26 @@ id_stage id_stage_inst(
              .ex_to_id_bus(ex_to_id_bus),
              .mem_to_id_bus(mem_to_id_bus),
              .wb_to_id_bus(wb_to_id_bus),
+             .csr_rdata(csr_rdata),
              .if_to_id_valid(if_to_id_valid),
              .ex_allow_in(ex_allow_in),
 
              .id_to_ex_bus(id_to_ex_bus),
+             .csr_raddr(csr_raddr),
              .id_allow_in(id_allow_in),
              .id_to_ex_valid(id_to_ex_valid)
          );
 
 ex_stage ex_stage_inst(
+             // input
              .clk(clk),
              .rst_n(rst_n),
              .id_to_ex_bus(id_to_ex_bus),
+             // from csr
              .id_to_ex_valid(id_to_ex_valid),
              .mem_allow_in(mem_allow_in),
 
+             // output
              .dram_adr(dram_adr),
              .dram_w_op(dram_w_op),
              .dram_we(dram_we),
@@ -108,6 +120,10 @@ ex_stage ex_stage_inst(
              .ex_to_if_bus(ex_to_if_bus),
              .ex_to_id_bus(ex_to_id_bus),
              .ex_to_mem_bus(ex_to_mem_bus),
+             // to csr
+             .csr_we(csr_we),
+             .csr_waddr(csr_waddr),
+             .csr_wdata_o(csr_wdata),
              .ex_allow_in(ex_allow_in),
              .ex_to_mem_valid(ex_to_mem_valid)
          );
@@ -135,6 +151,22 @@ wb_stage wb_stage_inst(
              .wb_to_id_bus(wb_to_id_bus),
              .wb_allow_in(wb_allow_in)
          );
+
+csr csr_inst(
+        // input
+        .clk(clk),
+        .rst_n(rst_n),
+        // from id_stage
+        .csr_raddr(csr_raddr),
+        // from ex_stage
+        .csr_we(csr_we),
+        .csr_waddr(csr_waddr),
+        .csr_wdata(csr_wdata),
+
+        // output
+        // to id_stage
+        .csr_rdata(csr_rdata)
+    );
 
 irom #(
          .IROM_FILE(IROM_FILE)

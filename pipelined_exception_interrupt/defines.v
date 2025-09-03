@@ -99,11 +99,21 @@
 `define MEM_EXT_W  3'b100
 
 // bus width
-`define IF_TO_ID_BUS_WIDTH 64
-`define ID_TO_EX_BUS_WIDTH 295
-`define EX_TO_IF_BUS_WIDTH 33
-`define EX_TO_ID_BUS_WIDTH 41
-`define EX_TO_MEM_BUS_WIDTH 107
+`define IF_TO_ID_BUS_WIDTH  64
+`define ID_TO_EX_BUS_WIDTH  328
+`define EX_TO_IF_BUS_WIDTH  33
+`define EX_TO_ID_BUS_WIDTH  41
+`define EX_TO_MEM_BUS_WIDTH 139
 `define MEM_TO_ID_BUS_WIDTH 39
 `define MEM_TO_WB_BUS_WIDTH 38
-`define WB_TO_ID_BUS_WIDTH 39
+`define WB_TO_ID_BUS_WIDTH  39
+
+// csr address
+// TODO: need to be perfected
+`define CSR_MSTATUS 12'h300
+`define CSR_MIE     12'h304
+`define CSR_MTVEC   12'h305
+`define CSR_MEPC    12'h341
+`define CSR_MCAUSE  12'h342
+`define CSR_MTVAL   12'h343
+`define CSR_MIP     12'h344
