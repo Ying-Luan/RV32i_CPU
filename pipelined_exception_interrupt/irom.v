@@ -45,7 +45,7 @@ end
 
 initial
 begin
-    $readmemh(ROM_FILE, rom);
+    $readmemh(IROM_FILE, rom);
 end
 
 always @(posedge clk)

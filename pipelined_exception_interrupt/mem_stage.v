@@ -47,9 +47,9 @@ begin
     end
 end
 
-wire [2: 0] mem_ext_op;
+wire [`MEM_EXT_OP_WIDTH - 1: 0] mem_ext_op;
 wire rf_we;
-wire [1: 0] rf_wsel;
+wire [`RF_WSEL_WIDTH - 1: 0] rf_wsel;
 wire [31: 0] pc4;
 wire [31: 0] ext;
 wire [4: 0] wb_reg;
@@ -70,8 +70,8 @@ assign {
 // output bus
 reg [31: 0] wb_data;
 assign mem_to_wb_bus = {  // 38 bits
-           rf_we,                                  // 1 bit
-           wb_reg,                                 // 5 bits
+           rf_we,        // 1 bit
+           wb_reg,       // 5 bits
            wb_data      // 32 bits
        };
 
@@ -123,9 +123,9 @@ end
 
 // bypass
 assign mem_to_id_bus = {  // 39 bits
-           mem_valid,              // 1 bit
-           rf_we,                 // 1 bit
-           wb_reg,             // 5 bits
+           mem_valid,                 // 1 bit
+           rf_we,                    // 1 bit
+           wb_reg,                // 5 bits
            wb_data      // 32 bits
        };
 

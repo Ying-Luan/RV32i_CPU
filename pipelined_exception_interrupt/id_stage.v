@@ -99,28 +99,28 @@ wire [`CSR_ADDRESS_WIDTH - 1: 0] csr_waddr;
 reg [31: 0] csr_wdata;
 wire [`CSR_WDATA_OP_WIDTH - 1: 0] csr_wdata_op;
 assign id_to_ex_bus = {  // 328 bits
-           npc_op,                                                           // 2 bits
-           ram_we,                                                           // 1 bit
-           ram_w_op,                                                         // 2 bits
-           mem_ext_op,                                                       // 3 bits
-           alu_op,                                                           // 4 bits
-           alu_f_op,                                                         // 3 bits
-           id_rf_we,                                                       // 1 bit
-           rf_wsel,                                                          // 3 bits
-           pc4,                                                              // 32 bits
-           pc,                                                               // 32 bits
-           ext,                                                              // 32 bits
-           rD1_final,                                                              // 32 bits
-           wb_reg_first,                                                     // 5 bits
-           alu_a,                                                            // 32 bits
-           alu_b,                                                            // 32 bits
-           rD2_final,                                                        // 32 bits
-           is_load,                  // 1 bit
+           npc_op,                 // 2 bits
+           ram_we,                 // 1 bit
+           ram_w_op,               // 2 bits
+           mem_ext_op,             // 3 bits
+           alu_op,                 // 4 bits
+           alu_f_op,               // 3 bits
+           id_rf_we,               // 1 bit
+           rf_wsel,                // 3 bits
+           pc4,                    // 32 bits
+           pc,                     // 32 bits
+           ext,                    // 32 bits
+           rD1_final,             // 32 bits
+           wb_reg_first,          // 5 bits
+           alu_a,                 // 32 bits
+           alu_b,                 // 32 bits
+           rD2_final,             // 32 bits
+           is_load,               // 1 bit
            // csr
-           csr_rdata,                // 32 bits
-           csr_we,                    // 1 bit
-           csr_waddr,                // 12 bits
-           csr_wdata,                // 32 bits
+           csr_rdata,             // 32 bits
+           csr_we,                 // 1 bit
+           csr_waddr,             // 12 bits
+           csr_wdata,             // 32 bits
            csr_wdata_op       // 2 bits
        };
 

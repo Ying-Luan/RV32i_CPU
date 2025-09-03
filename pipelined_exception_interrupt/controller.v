@@ -185,7 +185,7 @@ begin
                     mem_ext_op = `MEM_EXT_H;
                 3'b101:
                     mem_ext_op = `MEM_EXT_HU;
-                3'b010:
+                3'b010:   // lw
                     mem_ext_op = `MEM_EXT_W;
                 default:
                     invalid_instruction = `TRUE;

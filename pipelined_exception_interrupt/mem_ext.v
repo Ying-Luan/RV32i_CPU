@@ -22,7 +22,7 @@
 `include "defines.v"
 
 module mem_ext(
-           input wire [2: 0] op,
+           input wire [`MEM_EXT_OP_WIDTH - 1: 0] op,
            input wire [31: 0] din,
 
            output reg [31: 0] ext
