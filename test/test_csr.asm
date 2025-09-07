@@ -29,8 +29,8 @@ _start:
     csrrc x10, mstatus, x9    # x10 = mstatus旧值(0x2F0), mstatus = 0x2F0 & ~0x0F0 = 0x200
     
     # 测试5: 测试其他CSR寄存器 - MIE
-    addi x11, x0, 0x888     # x11 = 0x888
-    csrrw x12, mie, x11   # x12 = mie旧值(0), mie = 0x888
+    li x11, 0x888           # x11 = 0x888 (使用li伪指令)
+    csrrw x12, mie, x11     # x12 = mie旧值(0), mie = 0x888
     
     # 测试6: 立即数形式的CSR指令 - CSRRWI
     # csrrwi rd, csr, uimm  ->  rd = csr, csr = uimm
@@ -45,12 +45,12 @@ _start:
     csrrci x15, mie, 1    # x15 = mie旧值(31), mie = 31 & ~1 = 30
     
     # 测试9: 测试MTVEC寄存器
-    addi x16, x0, 0x1000    # x16 = 0x1000 (中断向量地址)
+    li x16, 0x1000          # x16 = 0x1000 (使用li伪指令)
     csrrw x17, mtvec, x16   # x17 = mtvec旧值(0), mtvec = 0x1000
     
     # 测试10: 测试MEPC寄存器
-    addi x18, x0, 0x2000    # x18 = 0x2000 (异常返回地址)
-    csrrw x19, mepc, x18   # x19 = mepc旧值(0), mepc = 0x2000
+    li x18, 0x2000          # x18 = 0x2000 (使用li伪指令)
+    csrrw x19, mepc, x18    # x19 = mepc旧值(0), mepc = 0x2000
     
     # 测试11: 读取所有CSR寄存器的值进行验证
     csrr x20, mstatus         # x20 = mstatus = 0x200
