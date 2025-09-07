@@ -119,7 +119,18 @@ begin
                 3'b011:
                     alu_op = `ALU_SLTU;
                 default:
+                begin
+                    npc_op = `NPC_PC4;
+                    rf_we = `CLOSE;
+                    rf_wsel = `WB_ALU;
+                    alu_a_sel = `ALU_A_RS1;
+                    alu_b_sel = `ALU_B_RS2;
+                    rd1_en = `DISABLE;
+                    rd2_en = `DISABLE;
+                    ram_we = `CLOSE;
+
                     invalid_instruction = `TRUE;
+                end
             endcase
         end
         7'b0010011:
@@ -159,7 +170,19 @@ begin
                 3'b011:
                     alu_op = `ALU_SLTU;
                 default:
+                begin
+                    npc_op = `NPC_PC4;
+                    rf_we = `CLOSE;
+                    rf_wsel = `WB_ALU;
+                    sext_op = `EXT_I;
+                    alu_a_sel = `ALU_A_RS1;
+                    alu_b_sel = `ALU_B_EXT;
+                    rd1_en = `DISABLE;
+                    rd2_en = `DISABLE;
+                    ram_we = `CLOSE;
+
                     invalid_instruction = `TRUE;
+                end
             endcase
         end
         7'b0000011:
@@ -185,10 +208,24 @@ begin
                     mem_ext_op = `MEM_EXT_H;
                 3'b101:
                     mem_ext_op = `MEM_EXT_HU;
-                3'b010:   // lw
+                3'b010:           // lw
                     mem_ext_op = `MEM_EXT_W;
                 default:
+                begin
+                    npc_op = `NPC_PC4;
+                    rf_we = `CLOSE;
+                    rf_wsel = `WB_ALU;
+                    sext_op = `EXT_I;
+                    alu_op = `ALU_ADD;
+                    alu_a_sel = `ALU_A_RS1;
+                    alu_b_sel = `ALU_B_RS2;
+                    rd1_en = `DISABLE;
+                    rd2_en = `DISABLE;
+                    ram_we = `CLOSE;
+                    is_load = `CLOSE;
+
                     invalid_instruction = `TRUE;
+                end
             endcase
         end
         7'b1100111:
@@ -238,7 +275,13 @@ begin
                     csr_wdata_op = `CSR_WDATA_OP_ANDN;
                 end
                 default:
+                begin
+                    rf_we = `CLOSE;
+                    rf_wsel = `WB_ALU;
+                    csr_we = `FALSE;
+
                     invalid_instruction = `TRUE;
+                end
             endcase
         end
         7'b0100011:
@@ -261,7 +304,19 @@ begin
                 3'b010:
                     ram_w_op = `W_W;
                 default:
+                begin
+                    npc_op = `NPC_PC4;
+                    rf_we = `CLOSE;
+                    sext_op = `EXT_I;
+                    alu_op = `ALU_ADD;
+                    alu_a_sel = `ALU_A_RS1;
+                    alu_b_sel = `ALU_B_RS2;
+                    rd1_en = `DISABLE;
+                    rd2_en = `DISABLE;
+                    ram_we = `CLOSE;
+
                     invalid_instruction = `TRUE;
+                end
             endcase
         end
         7'b1100011:
@@ -289,7 +344,18 @@ begin
                 3'b111:
                     alu_f_op = `F_BGEU;
                 default:
+                begin
+                    npc_op = `NPC_PC4;
+                    rf_we = `CLOSE;
+                    sext_op = `EXT_I;
+                    alu_a_sel = `ALU_A_RS1;
+                    alu_b_sel = `ALU_B_RS2;
+                    rd1_en = `DISABLE;
+                    rd2_en = `DISABLE;
+                    ram_we = `CLOSE;
+
                     invalid_instruction = `TRUE;
+                end
             endcase
         end
         7'b0110111:
