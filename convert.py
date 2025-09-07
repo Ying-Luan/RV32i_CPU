@@ -57,9 +57,9 @@ def asm2mem(input_file: str, output_file: Union[str, None] = None, temp_file_pre
 
     # 设置默认文件名
     if output_file is None:
-        output_file = input_file.split('.')[0] + '.hex'
+        output_file = os.path.splitext(input_file)[0] + '.hex'
     if temp_file_prefix is None:
-        temp_file_prefix = input_file.split('.')[0]
+        temp_file_prefix = os.path.splitext(input_file)[0]
 
     # 设置命令
     commend_asm2o = ["riscv64-unknown-elf-as", "-march=rv32i", "-mabi=ilp32", "-o", f"{temp_file_prefix}.o", input_file]
@@ -105,8 +105,8 @@ if __name__ == "__main__":
         asm2mem(input_file, output_file)
     elif len(argv) == 2:
         input_file = argv[1]
-        print(f'输出文件名默认为 {input_file.split(".")[0] + ".hex"}')
-        print(f'临时文件名前缀默认为 {input_file.split(".")[0]}')
+        print(f'输出文件名默认为 {os.path.splitext(input_file)[0] + ".hex"}')
+        print(f'临时文件名前缀默认为 {os.path.splitext(input_file)[0]}')
         asm2mem(input_file)
     else:
         print("正确用法: python test.py <input_file.asm> [output_file.hex] [temp_name]")

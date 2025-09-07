@@ -35,7 +35,7 @@ end
 
 // 实例化CPU，指定使用 test.hex 作为指令文件
 cpu #(
-        .IROM_FILE("E:/Computer_study/Verilog/RV32i_CPU/test/test_comprehensive.hex")  // 替换为你的 hex 文件路径
+        .IROM_FILE("E:/Computer_study/Verilog/RV32i_CPU/test/test_csr.hex")  // 替换为你的 hex 文件路径
     ) cpu_inst (
         .clk(clk),
         .rst_n(rst_n)
@@ -77,78 +77,53 @@ begin
                   cpu_inst.id_stage_inst.wb_wb_reg,
                   cpu_inst.id_stage_inst.wb_rf_we,
                   cpu_inst.id_stage_inst.wb_data);
-         //  $display("[wD] id_stage.wb_data=%h, mem_stage.wb_data=%h, wb_stage.wb_data=%h",
-         //           cpu_inst.id_stage_inst.wb_data,
-         //           cpu_inst.mem_stage_inst.wb_data,
-         //           cpu_inst.wb_stage_inst.wb_data);
-         //  $display("[mem_stage.wb_data] mem_stage.mem_dout=%h, mem_stage.dram_rdo=%h, mem_stage.mem_ext_op=%h, ex_stage.mem_ext_op=%b",
-         //           cpu_inst.mem_stage_inst.mem_dout,
-         //           cpu_inst.mem_stage_inst.dram_rdo,
-         //           cpu_inst.mem_stage_inst.mem_ext_op,
-         //           cpu_inst.ex_stage_inst.mem_ext_op);
-         //  $display("[mem_stage.mem_ext_op] ex_stage.ex_to_mem_bus=%b, ex_stage.ex_to_mem_bus[138:136]=%b, mem_stage.ex_to_mem_bus=%h, mem_stage.mem_regs=%h, mem_stage.mem_regs[138:136]=%b",
-         //           cpu_inst.ex_stage_inst.ex_to_mem_bus,
-         //           cpu_inst.ex_stage_inst.ex_to_mem_bus[138: 136],
-         //           cpu_inst.mem_stage_inst.ex_to_mem_bus,
-         //           cpu_inst.mem_stage_inst.mem_regs,
-         //           cpu_inst.mem_stage_inst.mem_regs[138: 136]);
-         //  $display("temp=%b",
-         //           cpu_inst.ex_stage_inst.temp);
-         //  $display("%b",
-         //           cpu_inst.ex_stage_inst.ex_to_mem_bus);
-         //  $display("%b%b%b%b%b%b%b%b",
-         //           cpu_inst.ex_stage_inst.mem_ext_op,
-         //           cpu_inst.ex_stage_inst.rf_we,
-         //           cpu_inst.ex_stage_inst.rf_wsel,
-         //           cpu_inst.ex_stage_inst.pc4,
-         //           cpu_inst.ex_stage_inst.ext,
-         //           cpu_inst.ex_stage_inst.wb_reg,
-         //           cpu_inst.ex_stage_inst.alu_c,
-         //           cpu_inst.ex_stage_inst.csr_rdata);
-         //  $display("[rf_we] wb_rf_we=%b, | id_rf_we=%b, ex_stage.rf_we=%b, mem_stage.rf_we=%b, wb_stage.rf_we=%b, wb_stage.rf_en=%b",
-         //           cpu_inst.id_stage_inst.wb_rf_we,
+         $display("[csr] csr_raddr=%h. csr_rdata=%h, csr_we=%b, csr_waddr=%h, csr_wdata=%h",
+                  cpu_inst.csr_inst.csr_raddr,
+                  cpu_inst.csr_inst.csr_rdata,
+                  cpu_inst.csr_inst.csr_we,
+                  cpu_inst.csr_inst.csr_waddr,
+                  cpu_inst.csr_inst.csr_wdata);
+         $display("[csr] mstatus=%h, mie=%h, mtvec=%h, mepc=%h, mcause=%h, mtval=%h, mip=%h",
+                  cpu_inst.csr_inst.mstatus,
+                  cpu_inst.csr_inst.mie,
+                  cpu_inst.csr_inst.mtvec,
+                  cpu_inst.csr_inst.mepc,
+                  cpu_inst.csr_inst.mcause,
+                  cpu_inst.csr_inst.mtval,
+                  cpu_inst.csr_inst.mip
+                 );
+         //  $display("[流水线] IF_VALID=%b,    ID_VALID=%b,    EX_VALID=%b,    MEM_VALID=%b,    WB_VALID=%b",
+         //           cpu_inst.if_stage_inst.if_valid,
+         //           cpu_inst.id_stage_inst.id_valid,
+         //           cpu_inst.ex_stage_inst.ex_valid,
+         //           cpu_inst.mem_stage_inst.mem_valid,
+         //           cpu_inst.wb_stage_inst.wb_valid);
+         //  $display("[流水线] IF_READY_GO=%b, ID_READY_GO=%b, EX_READY_GO=%b, MEM_READY_GO=%b, WB_READY_GO=%b",
+         //           cpu_inst.if_stage_inst.if_ready_go,
+         //           cpu_inst.id_stage_inst.id_ready_go,
+         //           cpu_inst.ex_stage_inst.ex_ready_go,
+         //           cpu_inst.mem_stage_inst.mem_ready_go,
+         //           cpu_inst.wb_stage_inst.wb_ready_go);
+         //  $display("[数据冒险] rf_rd1_hazard=%b, rf_rd2_hazard=%b",
+         //           cpu_inst.id_stage_inst.rf_rd1_hazard,
+         //           cpu_inst.id_stage_inst.rf_rd2_hazard);
+         //  $display("[数据冒险] use_rf_rd1=%b,    use_rf_rd2=%b",
+         //           cpu_inst.id_stage_inst.use_rf_rd1,
+         //           cpu_inst.id_stage_inst.use_rf_rd2);
+         //  $display("[数据冒险] rd1_en=%b,        rd2_en=%b",
+         //           cpu_inst.id_stage_inst.rd1_en,
+         //           cpu_inst.id_stage_inst.rd2_en);
+         //  $display("[数据冒险] ex_rf_we=%b,  mem_rf_we=%b,  wb_rf_we=%b",
+         //           cpu_inst.id_stage_inst.ex_rf_we,
+         //           cpu_inst.id_stage_inst.mem_rf_we,
+         //           cpu_inst.id_stage_inst.wb_rf_we);
+         //  $display("[数据冒险] ex_wb_reg=%d, mem_wb_reg=%d, wb_wb_reg=%d",
+         //           cpu_inst.id_stage_inst.ex_wb_reg,
+         //           cpu_inst.id_stage_inst.mem_wb_reg,
+         //           cpu_inst.id_stage_inst.wb_wb_reg);
+         //  $display("[数据冒险] id_rf_we=%b, EX.rf_we=%b",
          //           cpu_inst.id_stage_inst.id_rf_we,
-         //           cpu_inst.ex_stage_inst.rf_we,
-         //           cpu_inst.mem_stage_inst.rf_we,
-         //           cpu_inst.wb_stage_inst.rf_we,
-         //           cpu_inst.wb_stage_inst.rf_en);
-         //  $display("[ex_stage.rf_we] id_stage.id_to_ex_bus=%h, ex_stage.id_to_ex_bus=%h, ex_stage.ex_regs=%h",
-         //           cpu_inst.id_stage_inst.id_to_ex_bus,
-         //           cpu_inst.ex_stage_inst.id_to_ex_bus,
-         //           cpu_inst.ex_stage_inst.ex_regs);
-         $display("[流水线] IF_VALID=%b,    ID_VALID=%b,    EX_VALID=%b,    MEM_VALID=%b,    WB_VALID=%b",
-                  cpu_inst.if_stage_inst.if_valid,
-                  cpu_inst.id_stage_inst.id_valid,
-                  cpu_inst.ex_stage_inst.ex_valid,
-                  cpu_inst.mem_stage_inst.mem_valid,
-                  cpu_inst.wb_stage_inst.wb_valid);
-         $display("[流水线] IF_READY_GO=%b, ID_READY_GO=%b, EX_READY_GO=%b, MEM_READY_GO=%b, WB_READY_GO=%b",
-                  cpu_inst.if_stage_inst.if_ready_go,
-                  cpu_inst.id_stage_inst.id_ready_go,
-                  cpu_inst.ex_stage_inst.ex_ready_go,
-                  cpu_inst.mem_stage_inst.mem_ready_go,
-                  cpu_inst.wb_stage_inst.wb_ready_go);
-         $display("[数据冒险] rf_rd1_hazard=%b, rf_rd2_hazard=%b",
-                  cpu_inst.id_stage_inst.rf_rd1_hazard,
-                  cpu_inst.id_stage_inst.rf_rd2_hazard);
-         $display("[数据冒险] use_rf_rd1=%b,    use_rf_rd2=%b",
-                  cpu_inst.id_stage_inst.use_rf_rd1,
-                  cpu_inst.id_stage_inst.use_rf_rd2);
-         $display("[数据冒险] rd1_en=%b,        rd2_en=%b",
-                  cpu_inst.id_stage_inst.rd1_en,
-                  cpu_inst.id_stage_inst.rd2_en);
-         $display("[数据冒险] ex_rf_we=%b,  mem_rf_we=%b,  wb_rf_we=%b",
-                  cpu_inst.id_stage_inst.ex_rf_we,
-                  cpu_inst.id_stage_inst.mem_rf_we,
-                  cpu_inst.id_stage_inst.wb_rf_we);
-         $display("[数据冒险] ex_wb_reg=%d, mem_wb_reg=%d, wb_wb_reg=%d",
-                  cpu_inst.id_stage_inst.ex_wb_reg,
-                  cpu_inst.id_stage_inst.mem_wb_reg,
-                  cpu_inst.id_stage_inst.wb_wb_reg);
-         $display("[数据冒险] id_rf_we=%b, EX.rf_we=%b",
-                  cpu_inst.id_stage_inst.id_rf_we,
-                  cpu_inst.ex_stage_inst.rf_we);
-
+         //           cpu_inst.ex_stage_inst.rf_we);
          $display("[寄存器] x0 =%h, x1 =%h, x2 =%h, x3 =%h, x4 =%h, x5 =%h, x6 =%h, x7 =%h",
                   cpu_inst.id_stage_inst.rf_inst.regs[0],
                   cpu_inst.id_stage_inst.rf_inst.regs[1],

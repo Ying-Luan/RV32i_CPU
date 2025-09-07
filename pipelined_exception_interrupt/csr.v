@@ -29,30 +29,47 @@ reg [31: 0] mip;
 // read
 always @( * )
 begin
-    case (csr_raddr)
-        `CSR_MSTATUS:
-            csr_rdata = mstatus;
-        `CSR_MIE:
-            csr_rdata = mie;
-        `CSR_MTVEC:
-            csr_rdata = mtvec;
-        `CSR_MEPC:
-            csr_rdata = mepc;
-        `CSR_MCAUSE:
-            csr_rdata = mcause;
-        `CSR_MTVAL:
-            csr_rdata = mtval;
-        `CSR_MIP:
-            csr_rdata = mip;
-        default:
-            csr_rdata = 32'b0;
-    endcase
+    if (csr_we == `TRUE && csr_raddr == csr_waddr)
+    begin
+        csr_rdata = csr_wdata;
+    end
+    else
+    begin
+        case (csr_raddr)
+            `CSR_MSTATUS:
+                csr_rdata = mstatus;
+            `CSR_MIE:
+                csr_rdata = mie;
+            `CSR_MTVEC:
+                csr_rdata = mtvec;
+            `CSR_MEPC:
+                csr_rdata = mepc;
+            `CSR_MCAUSE:
+                csr_rdata = mcause;
+            `CSR_MTVAL:
+                csr_rdata = mtval;
+            `CSR_MIP:
+                csr_rdata = mip;
+            default:
+                csr_rdata = 32'b0;
+        endcase
+    end
 end
 
 // write
 always @(posedge clk)
 begin
-    if (csr_we)
+    if (~rst_n)
+    begin
+        mstatus <= 32'b0;
+        mie <= 32'b0;
+        mtvec <= 32'b0;
+        mepc <= 32'b0;
+        mcause <= 32'b0;
+        mtval <= 32'b0;
+        mip <= 32'b0;
+    end
+    else if (csr_we)
     begin
         case (csr_waddr)
             `CSR_MSTATUS:
