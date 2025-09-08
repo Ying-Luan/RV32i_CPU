@@ -129,3 +129,10 @@
 `define CSR_MCAUSE  12'h342
 `define CSR_MTVAL   12'h343
 `define CSR_MIP     12'h344
+
+// exc_status
+`define EXC_STATUS_WIDTH 2
+`define EXC_STATUS_IDLE   2'b00
+`define EXC_STATUS_ECALL  2'b01
+`define EXC_STATUS_EBREAK 2'b10
+`define EXC_STATUS_MRET   2'b11

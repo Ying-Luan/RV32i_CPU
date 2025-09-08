@@ -49,7 +49,7 @@ reg [31: 0] wD;
 wire [31: 0] inst;
 assign inst = irom_inst;
 
-// Controller signals
+// decoder signals
 wire [`SEXT_OP_WIDTH - 1: 0] sext_op;
 wire [`NPC_OP_WIDTH - 1: 0] npc_op;
 wire ram_we;
@@ -99,28 +99,28 @@ wire [`CSR_ADDRESS_WIDTH - 1: 0] csr_waddr;
 reg [31: 0] csr_wdata;
 wire [`CSR_WDATA_OP_WIDTH - 1: 0] csr_wdata_op;
 assign id_to_ex_bus = {  // 328 bits
-           npc_op,                 // 2 bits
-           ram_we,                 // 1 bit
-           ram_w_op,               // 2 bits
-           mem_ext_op,             // 3 bits
-           alu_op,                 // 4 bits
-           alu_f_op,               // 3 bits
-           id_rf_we,               // 1 bit
-           rf_wsel,                // 3 bits
-           pc4,                    // 32 bits
-           pc,                     // 32 bits
-           ext,                    // 32 bits
-           rD1_final,             // 32 bits
-           wb_reg_first,          // 5 bits
-           alu_a,                 // 32 bits
-           alu_b,                 // 32 bits
-           rD2_final,             // 32 bits
-           is_load,               // 1 bit
+           npc_op,                  // 2 bits
+           ram_we,                  // 1 bit
+           ram_w_op,                // 2 bits
+           mem_ext_op,              // 3 bits
+           alu_op,                  // 4 bits
+           alu_f_op,                // 3 bits
+           id_rf_we,                // 1 bit
+           rf_wsel,                 // 3 bits
+           pc4,                     // 32 bits
+           pc,                      // 32 bits
+           ext,                     // 32 bits
+           rD1_final,              // 32 bits
+           wb_reg_first,           // 5 bits
+           alu_a,                  // 32 bits
+           alu_b,                  // 32 bits
+           rD2_final,              // 32 bits
+           is_load,                // 1 bit
            // csr
-           csr_rdata,             // 32 bits
-           csr_we,                 // 1 bit
-           csr_waddr,             // 12 bits
-           csr_wdata,             // 32 bits
+           csr_rdata,              // 32 bits
+           csr_we,                  // 1 bit
+           csr_waddr,              // 12 bits
+           csr_wdata,              // 32 bits
            csr_wdata_op       // 2 bits
        };
 
@@ -153,31 +153,31 @@ end
 
 assign wb_reg_first = inst[11: 7];
 
-// controller
-controller controller_inst(
-               .opcode(inst[6: 0]),
-               .funct3(inst[14: 12]),
-               .funct7(inst[31: 25]),
+// decoder
+decoder decoder_inst(
+            .opcode(inst[6: 0]),
+            .funct3(inst[14: 12]),
+            .funct7(inst[31: 25]),
 
-               .sext_op(sext_op),
-               .npc_op(npc_op),
-               .ram_we(ram_we),
-               .ram_w_op(ram_w_op),
-               .mem_ext_op(mem_ext_op),
-               .alu_op(alu_op),
-               .alu_f_op(alu_f_op),
-               .alu_a_sel(alu_a_sel),
-               .alu_b_sel(alu_b_sel),
-               .rd1_en(rd1_en),
-               .rd2_en(rd2_en),
-               .rf_we(id_rf_we),
-               .rf_wsel(rf_wsel),
-               .is_load(is_load),
-               .csr_we(csr_we),
-               .csr_wdata_sel(csr_wdata_sel),
-               .csr_wdata_op(csr_wdata_op),
-               .invalid_instruction(invalid_instruction)
-           );
+            .sext_op(sext_op),
+            .npc_op(npc_op),
+            .ram_we(ram_we),
+            .ram_w_op(ram_w_op),
+            .mem_ext_op(mem_ext_op),
+            .alu_op(alu_op),
+            .alu_f_op(alu_f_op),
+            .alu_a_sel(alu_a_sel),
+            .alu_b_sel(alu_b_sel),
+            .rd1_en(rd1_en),
+            .rd2_en(rd2_en),
+            .rf_we(id_rf_we),
+            .rf_wsel(rf_wsel),
+            .is_load(is_load),
+            .csr_we(csr_we),
+            .csr_wdata_sel(csr_wdata_sel),
+            .csr_wdata_op(csr_wdata_op),
+            .invalid_instruction(invalid_instruction)
+        );
 
 // RF
 wire [4: 0] rR1;
