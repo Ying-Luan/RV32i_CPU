@@ -35,6 +35,8 @@ module id_stage(
            input wire [ `WB_TO_ID_BUS_WIDTH - 1: 0] wb_to_id_bus,
            // from csr
            input wire [31: 0] csr_rdata,
+           // from controller
+           input wire br_taken,
            input wire if_to_id_valid,
            input wire ex_allow_in,
 
@@ -99,28 +101,28 @@ wire [`CSR_ADDRESS_WIDTH - 1: 0] csr_waddr;
 reg [31: 0] csr_wdata;
 wire [`CSR_WDATA_OP_WIDTH - 1: 0] csr_wdata_op;
 assign id_to_ex_bus = {  // 328 bits
-           npc_op,                  // 2 bits
-           ram_we,                  // 1 bit
-           ram_w_op,                // 2 bits
-           mem_ext_op,              // 3 bits
-           alu_op,                  // 4 bits
-           alu_f_op,                // 3 bits
-           id_rf_we,                // 1 bit
-           rf_wsel,                 // 3 bits
-           pc4,                     // 32 bits
-           pc,                      // 32 bits
-           ext,                     // 32 bits
-           rD1_final,              // 32 bits
-           wb_reg_first,           // 5 bits
-           alu_a,                  // 32 bits
-           alu_b,                  // 32 bits
-           rD2_final,              // 32 bits
-           is_load,                // 1 bit
+           npc_op,                   // 2 bits
+           ram_we,                   // 1 bit
+           ram_w_op,                 // 2 bits
+           mem_ext_op,               // 3 bits
+           alu_op,                   // 4 bits
+           alu_f_op,                 // 3 bits
+           id_rf_we,                 // 1 bit
+           rf_wsel,                  // 3 bits
+           pc4,                      // 32 bits
+           pc,                       // 32 bits
+           ext,                      // 32 bits
+           rD1_final,               // 32 bits
+           wb_reg_first,            // 5 bits
+           alu_a,                   // 32 bits
+           alu_b,                   // 32 bits
+           rD2_final,               // 32 bits
+           is_load,                 // 1 bit
            // csr
-           csr_rdata,              // 32 bits
-           csr_we,                  // 1 bit
-           csr_waddr,              // 12 bits
-           csr_wdata,              // 32 bits
+           csr_rdata,               // 32 bits
+           csr_we,                   // 1 bit
+           csr_waddr,               // 12 bits
+           csr_wdata,               // 32 bits
            csr_wdata_op       // 2 bits
        };
 
@@ -132,7 +134,6 @@ wire id_ready_go;
 assign id_allow_in = !id_valid || (id_ready_go && ex_allow_in);
 assign id_to_ex_valid = id_valid && id_ready_go;
 
-wire br_taken;
 wire br_cancel;
 assign br_cancel = br_taken;
 always @(posedge clk)
@@ -253,7 +254,7 @@ wire ex_rf_we;
 wire [4: 0] ex_wb_reg;
 wire [31: 0] ex_rf_data;
 wire ex_is_load;
-assign {ex_valid, ex_rf_we, ex_wb_reg, ex_rf_data, ex_is_load, br_taken} = ex_to_id_bus;
+assign {ex_valid, ex_rf_we, ex_wb_reg, ex_rf_data, ex_is_load} = ex_to_id_bus;
 wire mem_valid;
 wire mem_rf_we;
 wire [4: 0] mem_wb_reg;

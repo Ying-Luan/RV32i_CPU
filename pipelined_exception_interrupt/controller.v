@@ -1,5 +1,6 @@
 module controller (
            // input
+           // from ex_stage
            input wire br_taken_i,
            input wire [31: 0] br_target_i,
            input wire hold_flag_clint_i,

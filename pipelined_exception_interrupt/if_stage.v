@@ -22,21 +22,20 @@
 `include "defines.v"
 
 module if_stage(
+           // input
            input wire clk,
            input wire rst_n,
-           input wire [`EX_TO_IF_BUS_WIDTH - 1: 0] ex_to_if_bus,
+           // from controller
+           input wire br_taken,
+           input wire [31: 0] br_target,
            input wire id_allow_in,
 
+           // output
            output wire [31: 0] irom_adr,
            output wire irom_en,
            output wire [`IF_TO_ID_BUS_WIDTH - 1: 0] if_to_id_bus,
            output wire if_to_id_valid
        );
-
-// input bus
-wire [31: 0] br_target;
-wire br_taken;
-assign {br_target, br_taken} = ex_to_if_bus;
 
 // output bus
 wire [31: 0] pc;

@@ -112,8 +112,7 @@
 // bus width
 `define IF_TO_ID_BUS_WIDTH  64
 `define ID_TO_EX_BUS_WIDTH  328
-`define EX_TO_IF_BUS_WIDTH  33
-`define EX_TO_ID_BUS_WIDTH  41
+`define EX_TO_ID_BUS_WIDTH  40
 `define EX_TO_MEM_BUS_WIDTH 140
 `define MEM_TO_ID_BUS_WIDTH 39
 `define MEM_TO_WB_BUS_WIDTH 38

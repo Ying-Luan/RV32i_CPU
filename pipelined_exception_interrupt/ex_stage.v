@@ -26,7 +26,6 @@ module ex_stage (
            input wire clk,
            input wire rst_n,
            input wire [`ID_TO_EX_BUS_WIDTH - 1: 0] id_to_ex_bus,
-           // from csr
            input wire id_to_ex_valid,
            input wire mem_allow_in,
 
@@ -35,18 +34,20 @@ module ex_stage (
            output wire [1: 0] dram_w_op,
            output wire dram_we,
            output wire [31: 0] dram_wdin,
-           output wire [ `EX_TO_IF_BUS_WIDTH - 1: 0] ex_to_if_bus,
            output wire [ `EX_TO_ID_BUS_WIDTH - 1: 0] ex_to_id_bus,
            output wire [`EX_TO_MEM_BUS_WIDTH - 1: 0] ex_to_mem_bus,
            // to csr
            output wire csr_we,
            output wire [11: 0] csr_waddr,
            output reg [31: 0] csr_wdata_o,
+           // to controller
+           output wire br_taken,
+           output reg [31: 0] br_target,
            output wire ex_allow_in,
            output wire ex_to_mem_valid
        );
 
-// ALU
+// alu
 wire alu_f;
 
 // input bus
@@ -105,20 +106,15 @@ assign {
         csr_wdata_op
     } = ex_regs;
 
-// output bus
-reg [31: 0] br_target;
-wire br_taken;
-assign ex_to_if_bus = {br_target, br_taken};  // 33 bits
-
 wire [31: 0] alu_c;
 assign ex_to_mem_bus = {  // 140 bits
-           mem_ext_op,              // 3 bits
-           rf_we,                   // 1 bit
-           rf_wsel,                 // 3 bits
-           pc4,                     // 32 bits
-           ext,                     // 32 bits
-           wb_reg,                  // 5 bits
-           alu_c,                   // 32 bits
+           mem_ext_op,                     // 3 bits
+           rf_we,                          // 1 bit
+           rf_wsel,                        // 3 bits
+           pc4,                            // 32 bits
+           ext,                            // 32 bits
+           wb_reg,                         // 5 bits
+           alu_c,                          // 32 bits
            // csr
            csr_rdata            // 32 bits
        };
@@ -215,13 +211,12 @@ begin
             rf_wdata = 32'b0;
     endcase
 end
-assign ex_to_id_bus = {  // 41 bits
-           ex_valid,                                                       // 1 bit
-           rf_we,                                                          // 1 bit
-           wb_reg,                                                         // 5 bits
-           rf_wdata,                                                       // 32 bits
-           is_load,                                                        // 1 bit
-           br_taken                             // 1 bit
+assign ex_to_id_bus = {  // 40 bits
+           ex_valid,                                                              // 1 bit
+           rf_we,                                                                 // 1 bit
+           wb_reg,                                                                // 5 bits
+           rf_wdata,                                                              // 32 bits
+           is_load                                                              // 1 bit
        };
 
 // branch
