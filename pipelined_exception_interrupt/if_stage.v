@@ -28,6 +28,7 @@ module if_stage(
            // from controller
            input wire br_taken,
            input wire [31: 0] br_target,
+           input wire hold_flag_if,
            input wire id_allow_in,
 
            // output
@@ -52,7 +53,7 @@ wire if_ready_go;
 
 assign pre_if_valid = rst_n;
 
-assign if_ready_go = 1;
+assign if_ready_go = !hold_flag_if;
 assign if_allow_in = !if_valid || (if_ready_go && id_allow_in);
 assign if_to_id_valid = if_valid && if_ready_go;
 

@@ -22,9 +22,7 @@
 `include "defines.v"
 
 module decoder(
-           input wire [6: 0] opcode,
-           input wire [2: 0] funct3,
-           input wire [6: 0] funct7,
+           input wire [31: 0] inst,
 
            // sext
            output reg [`SEXT_OP_WIDTH - 1: 0] sext_op,
@@ -49,9 +47,22 @@ module decoder(
            output reg csr_we,
            output reg csr_wdata_sel,
            output reg [`CSR_WDATA_OP_WIDTH - 1: 0] csr_wdata_op,
+           // clint
+           output reg [`EXC_STATUS_WIDTH - 1: 0] exc_status,
            // exception
            output reg invalid_instruction
        );
+
+
+wire [ 6: 0] opcode;
+wire [ 2: 0] funct3;
+wire [ 6: 0] funct7;
+wire [11: 0] funct12;
+
+assign opcode = inst[6: 0];
+assign funct3 = inst[14: 12];
+assign funct7 = inst[31: 25];
+assign funct12 = inst[31: 20];
 
 always @( * )
 begin
@@ -73,6 +84,7 @@ begin
     csr_we = `FALSE;
     csr_wdata_sel = `CSR_WDATA_SEL_RS1;
     csr_wdata_op = `CSR_WDATA_OP_NOP;
+    exc_status = `EXC_STATUS_IDLE;
     invalid_instruction = `FALSE;
 
     case (opcode)
@@ -208,7 +220,7 @@ begin
                     mem_ext_op = `MEM_EXT_H;
                 3'b101:
                     mem_ext_op = `MEM_EXT_HU;
-                3'b010:            // lw
+                3'b010:                   // lw
                     mem_ext_op = `MEM_EXT_W;
                 default:
                 begin
@@ -239,50 +251,70 @@ begin
             ram_we = `CLOSE;
         end
         7'b1110011:
-        begin  // I-type csr
-            rf_we = `OPEN;
-            rf_wsel = `WB_CSR;
-            csr_we = `TRUE;
-            case (funct3)
-                3'b001:
-                begin
-                    csr_wdata_sel = `CSR_WDATA_SEL_RS1;
-                    csr_wdata_op = `CSR_WDATA_OP_NOP;
-                end
-                3'b010:
-                begin
-                    csr_wdata_sel = `CSR_WDATA_SEL_RS1;
-                    csr_wdata_op = `CSR_WDATA_OP_OR;
-                end
-                3'b011:
-                begin
-                    csr_wdata_sel = `CSR_WDATA_SEL_RS1;
-                    csr_wdata_op = `CSR_WDATA_OP_ANDN;
-                end
-                3'b101:
-                begin
-                    csr_wdata_sel = `CSR_WDATA_SEL_IMM;
-                    csr_wdata_op = `CSR_WDATA_OP_NOP;
-                end
-                3'b110:
-                begin
-                    csr_wdata_sel = `CSR_WDATA_SEL_IMM;
-                    csr_wdata_op = `CSR_WDATA_OP_OR;
-                end
-                3'b111:
-                begin
-                    csr_wdata_sel = `CSR_WDATA_SEL_IMM;
-                    csr_wdata_op = `CSR_WDATA_OP_ANDN;
-                end
-                default:
-                begin
-                    rf_we = `CLOSE;
-                    rf_wsel = `WB_ALU;
-                    csr_we = `FALSE;
+        begin  // I-type ecall ebreak csr
+            if (funct3 == 3'b000)  // ecall ebreak
+            begin
+                case (funct12)
+                    12'b000000000000:
+                        exc_status = `EXC_STATUS_ECALL;  // ecall
+                    12'b000000000001:
+                        exc_status = `EXC_STATUS_EBREAK;  // ebreak
+                    12'b001100000010:
+                        exc_status = `EXC_STATUS_MRET;  // mret
+                    default:
+                    begin
+                        exc_status = `EXC_STATUS_IDLE;
 
-                    invalid_instruction = `TRUE;
-                end
-            endcase
+                        invalid_instruction = `TRUE;
+                    end
+                endcase
+            end
+            else  // csr
+            begin
+                rf_we = `OPEN;
+                rf_wsel = `WB_CSR;
+                csr_we = `TRUE;
+                case (funct3)
+                    3'b001:
+                    begin
+                        csr_wdata_sel = `CSR_WDATA_SEL_RS1;
+                        csr_wdata_op = `CSR_WDATA_OP_NOP;
+                    end
+                    3'b010:
+                    begin
+                        csr_wdata_sel = `CSR_WDATA_SEL_RS1;
+                        csr_wdata_op = `CSR_WDATA_OP_OR;
+                    end
+                    3'b011:
+                    begin
+                        csr_wdata_sel = `CSR_WDATA_SEL_RS1;
+                        csr_wdata_op = `CSR_WDATA_OP_ANDN;
+                    end
+                    3'b101:
+                    begin
+                        csr_wdata_sel = `CSR_WDATA_SEL_IMM;
+                        csr_wdata_op = `CSR_WDATA_OP_NOP;
+                    end
+                    3'b110:
+                    begin
+                        csr_wdata_sel = `CSR_WDATA_SEL_IMM;
+                        csr_wdata_op = `CSR_WDATA_OP_OR;
+                    end
+                    3'b111:
+                    begin
+                        csr_wdata_sel = `CSR_WDATA_SEL_IMM;
+                        csr_wdata_op = `CSR_WDATA_OP_ANDN;
+                    end
+                    default:
+                    begin
+                        rf_we = `CLOSE;
+                        rf_wsel = `WB_ALU;
+                        csr_we = `FALSE;
+
+                        invalid_instruction = `TRUE;
+                    end
+                endcase
+            end
         end
         7'b0100011:
         begin  // S-type

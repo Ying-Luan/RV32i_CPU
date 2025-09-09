@@ -12,10 +12,18 @@ module csr (
            input wire csr_we,
            input wire [`CSR_ADDRESS_WIDTH - 1: 0] csr_waddr,
            input wire [31: 0] csr_wdata,
+           // from clint
+           input wire csr_we_clint,
+           input wire [`CSR_ADDRESS_WIDTH - 1: 0] csr_waddr_clint,
+           input wire [31: 0] csr_wdata_clint,
 
            // output
            // to id_stage
-           output reg [31: 0] csr_rdata
+           output reg [31: 0] csr_rdata,
+           // to clint
+           output wire [31: 0] csr_mtvec,
+           output wire [31: 0] csr_mepc,
+           output wire [31: 0] csr_mstatus
        );
 
 reg [31: 0] mstatus;
@@ -25,6 +33,10 @@ reg [31: 0] mepc;
 reg [31: 0] mcause;
 reg [31: 0] mtval;
 reg [31: 0] mip;
+
+assign csr_mtvec = mtvec;
+assign csr_mepc = mepc;
+assign csr_mstatus = mstatus;
 
 // read
 always @( * )
@@ -69,24 +81,46 @@ begin
         mtval <= 32'b0;
         mip <= 32'b0;
     end
-    else if (csr_we)
+    else
     begin
-        case (csr_waddr)
-            `CSR_MSTATUS:
-                mstatus <= csr_wdata;
-            `CSR_MIE:
-                mie <= csr_wdata;
-            `CSR_MTVEC:
-                mtvec <= csr_wdata;
-            `CSR_MEPC:
-                mepc <= csr_wdata;
-            `CSR_MCAUSE:
-                mcause <= csr_wdata;
-            `CSR_MTVAL:
-                mtval <= csr_wdata;
-            `CSR_MIP:
-                mip <= csr_wdata;
-        endcase
+        if (csr_we)  // TODO: priority
+        begin
+            case (csr_waddr)
+                `CSR_MSTATUS:
+                    mstatus <= csr_wdata;
+                `CSR_MIE:
+                    mie <= csr_wdata;
+                `CSR_MTVEC:
+                    mtvec <= csr_wdata;
+                `CSR_MEPC:
+                    mepc <= csr_wdata;
+                `CSR_MCAUSE:
+                    mcause <= csr_wdata;
+                `CSR_MTVAL:
+                    mtval <= csr_wdata;
+                `CSR_MIP:
+                    mip <= csr_wdata;
+            endcase
+        end
+        else if (csr_we_clint)
+        begin
+            case (csr_waddr_clint)
+                `CSR_MSTATUS:
+                    mstatus <= csr_wdata_clint;
+                `CSR_MIE:
+                    mie <= csr_wdata_clint;
+                `CSR_MTVEC:
+                    mtvec <= csr_wdata_clint;
+                `CSR_MEPC:
+                    mepc <= csr_wdata_clint;
+                `CSR_MCAUSE:
+                    mcause <= csr_wdata_clint;
+                `CSR_MTVAL:
+                    mtval <= csr_wdata_clint;
+                `CSR_MIP:
+                    mip <= csr_wdata_clint;
+            endcase
+        end
     end
 end
 

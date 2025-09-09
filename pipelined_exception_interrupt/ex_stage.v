@@ -26,8 +26,13 @@ module ex_stage (
            input wire clk,
            input wire rst_n,
            input wire [`ID_TO_EX_BUS_WIDTH - 1: 0] id_to_ex_bus,
+           // from controller
+           input wire hold_flag_ex,
            input wire id_to_ex_valid,
            input wire mem_allow_in,
+           // from clint
+           input wire int_assert,
+           input wire [31: 0] int_addr,
 
            // output
            output wire [31: 0] dram_adr,
@@ -41,8 +46,8 @@ module ex_stage (
            output wire [11: 0] csr_waddr,
            output reg [31: 0] csr_wdata_o,
            // to controller
-           output wire br_taken,
-           output reg [31: 0] br_target,
+           output wire br_taken_o,
+           output wire [31: 0] br_target_o,
            output wire ex_allow_in,
            output wire ex_to_mem_valid
        );
@@ -108,13 +113,13 @@ assign {
 
 wire [31: 0] alu_c;
 assign ex_to_mem_bus = {  // 140 bits
-           mem_ext_op,                     // 3 bits
-           rf_we,                          // 1 bit
-           rf_wsel,                        // 3 bits
-           pc4,                            // 32 bits
-           ext,                            // 32 bits
-           wb_reg,                         // 5 bits
-           alu_c,                          // 32 bits
+           mem_ext_op,                           // 3 bits
+           rf_we,                                // 1 bit
+           rf_wsel,                              // 3 bits
+           pc4,                                  // 32 bits
+           ext,                                  // 32 bits
+           wb_reg,                               // 5 bits
+           alu_c,                                // 32 bits
            // csr
            csr_rdata            // 32 bits
        };
@@ -125,12 +130,13 @@ wire temp = mem_ext_op == ex_to_mem_bus[`EX_TO_MEM_BUS_WIDTH - 1 : `MEM_EXT_OP_W
 reg ex_valid;
 wire ex_ready_go;
 
-assign ex_ready_go = 1;
+assign ex_ready_go = !hold_flag_ex;
 assign ex_allow_in = !ex_valid || (ex_ready_go && mem_allow_in);
 assign ex_to_mem_valid = ex_valid && ex_ready_go;
 
+wire br_taken;
 wire br_cancel;
-assign br_cancel = br_taken;
+assign br_cancel = br_taken_o;
 always @(posedge clk)
 begin
     if (~rst_n)
@@ -147,6 +153,7 @@ begin
     end
 end
 
+reg [31: 0] br_target;
 always @( * )
 begin
     case (npc_op)
@@ -212,10 +219,10 @@ begin
     endcase
 end
 assign ex_to_id_bus = {  // 40 bits
-           ex_valid,                                                              // 1 bit
-           rf_we,                                                                 // 1 bit
-           wb_reg,                                                                // 5 bits
-           rf_wdata,                                                              // 32 bits
+           ex_valid,                                                                    // 1 bit
+           rf_we,                                                                       // 1 bit
+           wb_reg,                                                                      // 5 bits
+           rf_wdata,                                                                    // 32 bits
            is_load                                                              // 1 bit
        };
 
@@ -225,5 +232,7 @@ assign br_taken = ex_valid && (
            (npc_op == `NPC_JAL) ||
            (npc_op == `NPC_JALR)
        );
+assign br_taken_o = br_taken || int_assert;
+assign br_target_o = int_assert ? int_addr : br_target;
 
 endmodule

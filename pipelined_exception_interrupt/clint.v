@@ -6,10 +6,12 @@ module clint (
            // input
            input wire clk,
            input wire rst_n,
+           // from id_stage
            input wire [`EXC_STATUS_WIDTH - 1: 0] exc_status,
+           input wire [31: 0] inst_addr_i,
+           // from ex_stage
            input wire br_taken,
            input wire [31: 0] br_target,
-           input wire [31: 0] inst_addr_i,
            // from csr
            input wire [31: 0] csr_mtvec,
            input wire [31: 0] csr_mepc,
@@ -21,24 +23,27 @@ module clint (
            output reg csr_we,
            output reg [11: 0] csr_waddr,
            output reg [31: 0] csr_wdata,
+           // to ex_stage
            output reg int_assert,
            output reg [31: 0] int_addr
        );
 
 // int_state
+localparam INT_STATE_WIDTH = 2;
 localparam INT_STATE_IDLE = 2'b00;
 localparam INT_STATE_SYNC_ASSERT = 2'b01;
 localparam INT_STATE_MRET = 2'b10;
 
 // csr_state
+localparam CSR_STATE_WIDTH = 3;
 localparam CSR_STATE_IDLE = 3'b000;
 localparam CSR_STATE_MEPC = 3'b001;
 localparam CSR_STATE_MSTATUS = 3'b010;
 localparam CSR_STATE_MCAUSE = 3'b011;
 localparam CSR_STATE_MRET = 3'b100;
 
-reg [ 1: 0] int_state;
-reg [ 2: 0] csr_state;
+reg [INT_STATE_WIDTH - 1: 0] int_state;
+reg [CSR_STATE_WIDTH - 1: 0] csr_state;
 reg [31: 0] cause;
 reg [31: 0] inst_addr;
 

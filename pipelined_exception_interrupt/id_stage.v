@@ -37,12 +37,16 @@ module id_stage(
            input wire [31: 0] csr_rdata,
            // from controller
            input wire br_taken,
+           input wire hold_flag_id,
            input wire if_to_id_valid,
            input wire ex_allow_in,
 
            output wire [`ID_TO_EX_BUS_WIDTH - 1: 0] id_to_ex_bus,
            // to csr
            output wire [`CSR_ADDRESS_WIDTH - 1: 0] csr_raddr,
+           // to clint
+           output wire [`EXC_STATUS_WIDTH - 1: 0] exc_status,
+           output wire [31: 0] inst_addr,
            output wire id_allow_in,
            output wire id_to_ex_valid
        );
@@ -101,28 +105,28 @@ wire [`CSR_ADDRESS_WIDTH - 1: 0] csr_waddr;
 reg [31: 0] csr_wdata;
 wire [`CSR_WDATA_OP_WIDTH - 1: 0] csr_wdata_op;
 assign id_to_ex_bus = {  // 328 bits
-           npc_op,                   // 2 bits
-           ram_we,                   // 1 bit
-           ram_w_op,                 // 2 bits
-           mem_ext_op,               // 3 bits
-           alu_op,                   // 4 bits
-           alu_f_op,                 // 3 bits
-           id_rf_we,                 // 1 bit
-           rf_wsel,                  // 3 bits
-           pc4,                      // 32 bits
-           pc,                       // 32 bits
-           ext,                      // 32 bits
-           rD1_final,               // 32 bits
-           wb_reg_first,            // 5 bits
-           alu_a,                   // 32 bits
-           alu_b,                   // 32 bits
-           rD2_final,               // 32 bits
-           is_load,                 // 1 bit
+           npc_op,                        // 2 bits
+           ram_we,                        // 1 bit
+           ram_w_op,                      // 2 bits
+           mem_ext_op,                    // 3 bits
+           alu_op,                        // 4 bits
+           alu_f_op,                      // 3 bits
+           id_rf_we,                      // 1 bit
+           rf_wsel,                       // 3 bits
+           pc4,                           // 32 bits
+           pc,                            // 32 bits
+           ext,                           // 32 bits
+           rD1_final,                    // 32 bits
+           wb_reg_first,                 // 5 bits
+           alu_a,                        // 32 bits
+           alu_b,                        // 32 bits
+           rD2_final,                    // 32 bits
+           is_load,                      // 1 bit
            // csr
-           csr_rdata,               // 32 bits
-           csr_we,                   // 1 bit
-           csr_waddr,               // 12 bits
-           csr_wdata,               // 32 bits
+           csr_rdata,                    // 32 bits
+           csr_we,                        // 1 bit
+           csr_waddr,                    // 12 bits
+           csr_wdata,                    // 32 bits
            csr_wdata_op       // 2 bits
        };
 
@@ -130,7 +134,6 @@ assign id_to_ex_bus = {  // 328 bits
 reg id_valid;
 wire id_ready_go;
 
-// assign id_ready_go = 1;
 assign id_allow_in = !id_valid || (id_ready_go && ex_allow_in);
 assign id_to_ex_valid = id_valid && id_ready_go;
 
@@ -156,9 +159,7 @@ assign wb_reg_first = inst[11: 7];
 
 // decoder
 decoder decoder_inst(
-            .opcode(inst[6: 0]),
-            .funct3(inst[14: 12]),
-            .funct7(inst[31: 25]),
+            .inst(inst),
 
             .sext_op(sext_op),
             .npc_op(npc_op),
@@ -177,6 +178,7 @@ decoder decoder_inst(
             .csr_we(csr_we),
             .csr_wdata_sel(csr_wdata_sel),
             .csr_wdata_op(csr_wdata_op),
+            .exc_status(exc_status),
             .invalid_instruction(invalid_instruction)
         );
 
@@ -247,6 +249,7 @@ begin
             csr_wdata = 32'b0;
     endcase
 end
+assign inst_addr = pc;
 
 // hazard detection
 wire ex_valid;
@@ -276,7 +279,7 @@ assign rf_rd2_hazard = use_rf_rd2 && (
            (ex_valid && ex_rf_we && ex_is_load && (ex_wb_reg != 5'b0) && (ex_wb_reg == rR2))
        );
 
-assign id_ready_go = !(rf_rd1_hazard || rf_rd2_hazard);
+assign id_ready_go = !(rf_rd1_hazard || rf_rd2_hazard || hold_flag_id);
 
 // bypass
 assign rD1_final =
