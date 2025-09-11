@@ -23,7 +23,8 @@ module csr (
            // to clint
            output wire [31: 0] csr_mtvec,
            output wire [31: 0] csr_mepc,
-           output wire [31: 0] csr_mstatus
+           output wire [31: 0] csr_mstatus,
+           output wire global_interrupt_enable
        );
 
 reg [31: 0] mstatus;
@@ -37,6 +38,8 @@ reg [31: 0] mip;
 assign csr_mtvec = mtvec;
 assign csr_mepc = mepc;
 assign csr_mstatus = mstatus;
+
+assign global_interrupt_enable = (mstatus[3] == `TRUE) ? `TRUE : `FALSE;
 
 // read
 always @( * )

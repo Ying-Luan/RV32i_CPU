@@ -45,7 +45,7 @@ module id_stage(
            // to csr
            output wire [`CSR_ADDRESS_WIDTH - 1: 0] csr_raddr,
            // to clint
-           output wire [`EXC_STATUS_WIDTH - 1: 0] exc_status,
+           output wire [`EXC_STATUS_WIDTH - 1: 0] exc_status_o,
            output wire [31: 0] inst_addr,
            output wire id_allow_in,
            output wire id_to_ex_valid
@@ -72,6 +72,7 @@ wire [`RF_WSEL_WIDTH - 1: 0] rf_wsel;
 wire is_load;
 wire csr_we;
 wire csr_wdata_sel;
+wire [`EXC_STATUS_WIDTH - 1: 0] exc_status;
 wire invalid_instruction;  // TODO: wait for implement
 
 // input bus
@@ -105,28 +106,28 @@ wire [`CSR_ADDRESS_WIDTH - 1: 0] csr_waddr;
 reg [31: 0] csr_wdata;
 wire [`CSR_WDATA_OP_WIDTH - 1: 0] csr_wdata_op;
 assign id_to_ex_bus = {  // 328 bits
-           npc_op,                        // 2 bits
-           ram_we,                        // 1 bit
-           ram_w_op,                      // 2 bits
-           mem_ext_op,                    // 3 bits
-           alu_op,                        // 4 bits
-           alu_f_op,                      // 3 bits
-           id_rf_we,                      // 1 bit
-           rf_wsel,                       // 3 bits
-           pc4,                           // 32 bits
-           pc,                            // 32 bits
-           ext,                           // 32 bits
-           rD1_final,                    // 32 bits
-           wb_reg_first,                 // 5 bits
-           alu_a,                        // 32 bits
-           alu_b,                        // 32 bits
-           rD2_final,                    // 32 bits
-           is_load,                      // 1 bit
+           npc_op,                           // 2 bits
+           ram_we,                           // 1 bit
+           ram_w_op,                         // 2 bits
+           mem_ext_op,                       // 3 bits
+           alu_op,                           // 4 bits
+           alu_f_op,                         // 3 bits
+           id_rf_we,                         // 1 bit
+           rf_wsel,                          // 3 bits
+           pc4,                              // 32 bits
+           pc,                               // 32 bits
+           ext,                              // 32 bits
+           rD1_final,                       // 32 bits
+           wb_reg_first,                    // 5 bits
+           alu_a,                           // 32 bits
+           alu_b,                           // 32 bits
+           rD2_final,                       // 32 bits
+           is_load,                         // 1 bit
            // csr
-           csr_rdata,                    // 32 bits
-           csr_we,                        // 1 bit
-           csr_waddr,                    // 12 bits
-           csr_wdata,                    // 32 bits
+           csr_rdata,                       // 32 bits
+           csr_we,                           // 1 bit
+           csr_waddr,                       // 12 bits
+           csr_wdata,                       // 32 bits
            csr_wdata_op       // 2 bits
        };
 
@@ -250,6 +251,23 @@ begin
     endcase
 end
 assign inst_addr = pc;
+
+// clint
+reg exc_status_en;
+always @(posedge clk)
+begin
+    if (~rst_n)
+    begin
+        exc_status_en <= `FALSE;
+    end
+    else if (hold_flag_id)
+    begin
+        exc_status_en <= `FALSE;
+    end
+    else
+        exc_status_en <= `TRUE;
+end
+assign exc_status_o = (exc_status_en == `TRUE) ? exc_status : `EXC_STATUS_IDLE;
 
 // hazard detection
 wire ex_valid;

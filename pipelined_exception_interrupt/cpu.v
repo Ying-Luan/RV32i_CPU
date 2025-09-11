@@ -81,6 +81,7 @@ wire [31: 0] csr_rdata;
 wire [31: 0] csr_mtvec;
 wire [31: 0] csr_mepc;
 wire [31: 0] csr_mstatus;
+wire global_interrupt_enable;
 
 // from clint
 wire hold_flag_clint;
@@ -133,7 +134,7 @@ id_stage id_stage_inst(
              .id_to_ex_bus(id_to_ex_bus),
              .csr_raddr(csr_raddr),
              // to clint
-             .exc_status(exc_status),
+             .exc_status_o(exc_status),
              .inst_addr(inst_addr),
              .id_allow_in(id_allow_in),
              .id_to_ex_valid(id_to_ex_valid)
@@ -240,7 +241,8 @@ csr csr_inst(
         // to clint
         .csr_mtvec(csr_mtvec),
         .csr_mepc(csr_mepc),
-        .csr_mstatus(csr_mstatus)
+        .csr_mstatus(csr_mstatus),
+        .global_interrupt_enable(global_interrupt_enable)
     );
 
 clint clint_inst(
@@ -256,6 +258,7 @@ clint clint_inst(
           .csr_mtvec(csr_mtvec),
           .csr_mepc(csr_mepc),
           .csr_mstatus(csr_mstatus),
+          .global_interrupt_enable(global_interrupt_enable),
 
           // output
           .hold_flag(hold_flag_clint),

@@ -16,6 +16,7 @@ module clint (
            input wire [31: 0] csr_mtvec,
            input wire [31: 0] csr_mepc,
            input wire [31: 0] csr_mstatus,
+           input wire global_interrupt_enable,      // TODO: wait for use
 
            // output
            output wire hold_flag,
@@ -138,7 +139,7 @@ begin
             begin
                 csr_we <= `TRUE;
                 csr_waddr <= `CSR_MSTATUS;
-                csr_wdata <= {csr_mstatus[31: 4], 1'b0, csr_mstatus[2: 0]};  // mstatus.MIE(mastatus[3]) = 0
+                csr_wdata <= {csr_mstatus[31: 8], csr_mstatus[3], csr_mstatus[6: 4], 1'b0, csr_mstatus[2: 0]};  // mstatus.MIE(mastatus[3]) = 0
             end
             CSR_STATE_MCAUSE:
             begin
@@ -150,7 +151,7 @@ begin
             begin
                 csr_we <= `TRUE;
                 csr_waddr <= `CSR_MSTATUS;
-                csr_wdata <= {csr_mstatus[31: 4], csr_mstatus[7], csr_mstatus[2: 0]};  // mstatus.MIE(mstatus[3]) = mstatus.MPIE(mstatus[7])
+                csr_wdata <= {csr_mstatus[31: 8], 1'b1, csr_mstatus[6: 4], csr_mstatus[7], csr_mstatus[2: 0]};  // mstatus.MIE(mstatus[3]) = mstatus.MPIE(mstatus[7])
             end
             default:
             begin
