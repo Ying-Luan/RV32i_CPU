@@ -35,7 +35,7 @@ end
 
 // 实例化CPU，指定使用 test.hex 作为指令文件
 cpu #(
-        .IROM_FILE("E:/Computer_study/Verilog/RV32i_CPU/test/test_csr.hex")  // 替换为你的 hex 文件路径
+        .IROM_FILE("E:/Computer_study/Verilog/RV32i_CPU/test/test_exception.hex")  // 替换为你的 hex 文件路径
     ) cpu_inst (
         .clk(clk),
         .rst_n(rst_n)
@@ -77,7 +77,7 @@ begin
                   cpu_inst.id_stage_inst.wb_wb_reg,
                   cpu_inst.id_stage_inst.wb_rf_we,
                   cpu_inst.id_stage_inst.wb_data);
-         $display("[csr] csr_raddr=%h. csr_rdata=%h, csr_we=%b, csr_waddr=%h, csr_wdata=%h",
+         $display("[csr] csr_raddr=%h, csr_rdata=%h, csr_we=%b, csr_waddr=%h, csr_wdata=%h",
                   cpu_inst.csr_inst.csr_raddr,
                   cpu_inst.csr_inst.csr_rdata,
                   cpu_inst.csr_inst.csr_we,
@@ -91,6 +91,10 @@ begin
                   cpu_inst.csr_inst.mcause,
                   cpu_inst.csr_inst.mtval,
                   cpu_inst.csr_inst.mip
+                 );
+         $display("[clint] int_state=%b, csr_state=%b",
+                  cpu_inst.clint_inst.int_state,
+                  cpu_inst.clint_inst.csr_state
                  );
          //  $display("[流水线] IF_VALID=%b,    ID_VALID=%b,    EX_VALID=%b,    MEM_VALID=%b,    WB_VALID=%b",
          //           cpu_inst.if_stage_inst.if_valid,

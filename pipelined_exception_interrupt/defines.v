@@ -112,8 +112,7 @@
 // bus width
 `define IF_TO_ID_BUS_WIDTH  64
 `define ID_TO_EX_BUS_WIDTH  328
-`define EX_TO_IF_BUS_WIDTH  33
-`define EX_TO_ID_BUS_WIDTH  41
+`define EX_TO_ID_BUS_WIDTH  40
 `define EX_TO_MEM_BUS_WIDTH 140
 `define MEM_TO_ID_BUS_WIDTH 39
 `define MEM_TO_WB_BUS_WIDTH 38
@@ -129,3 +128,10 @@
 `define CSR_MCAUSE  12'h342
 `define CSR_MTVAL   12'h343
 `define CSR_MIP     12'h344
+
+// exc_status
+`define EXC_STATUS_WIDTH 2
+`define EXC_STATUS_IDLE   2'b00
+`define EXC_STATUS_ECALL  2'b01
+`define EXC_STATUS_EBREAK 2'b10
+`define EXC_STATUS_MRET   2'b11

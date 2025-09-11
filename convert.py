@@ -52,14 +52,20 @@ def asm2mem(input_file: str, output_file: Union[str, None] = None, temp_file_pre
     if os.path.exists(input_file) is False:
         raise FileNotFoundError(f"输入文件 {input_file} 不存在。")
 
-    if verbose:
-        print(f"正在处理 {input_file}...")
-
     # 设置默认文件名
     if output_file is None:
         output_file = os.path.splitext(input_file)[0] + '.hex'
+        print(f"输出文件名默认为 {output_file}")
     if temp_file_prefix is None:
         temp_file_prefix = os.path.splitext(input_file)[0]
+        print(f"临时文件名前缀默认为 {temp_file_prefix}")
+
+    if os.path.exists(output_file) and os.path.getmtime(input_file) < os.path.getmtime(output_file):
+        print(f"{output_file} 已是最新，无需转换。")
+        return
+
+    if verbose:
+        print(f"正在处理 {input_file}...")
 
     # 设置命令
     commend_asm2o = ["riscv64-unknown-elf-as", "-march=rv32i", "-mabi=ilp32", "-o", f"{temp_file_prefix}.o", input_file]
@@ -101,12 +107,9 @@ if __name__ == "__main__":
     elif len(argv) == 3:
         input_file = argv[1]
         output_file = argv[2]
-        print("临时文件名默认为 temp")
         asm2mem(input_file, output_file)
     elif len(argv) == 2:
         input_file = argv[1]
-        print(f'输出文件名默认为 {os.path.splitext(input_file)[0] + ".hex"}')
-        print(f'临时文件名前缀默认为 {os.path.splitext(input_file)[0]}')
         asm2mem(input_file)
     else:
         print("正确用法: python test.py <input_file.asm> [output_file.hex] [temp_name]")

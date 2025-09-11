@@ -22,11 +22,15 @@
 `include "defines.v"
 
 module wb_stage(
+           // input
            input wire clk,
            input wire rst_n,
            input wire [`MEM_TO_WB_BUS_WIDTH - 1: 0] mem_to_wb_bus,
+           // from controller
+           input wire hold_flag_wb,
            input wire mem_to_wb_valid,
 
+           // output
            output wire [`WB_TO_ID_BUS_WIDTH - 1: 0] wb_to_id_bus,
            output wire wb_allow_in
        );
@@ -59,7 +63,7 @@ assign wb_to_id_bus = {wb_valid, rf_en, wb_reg, wb_data};  // 39 bits
 // reg wb_valid;
 wire wb_ready_go;
 
-assign wb_ready_go = 1;
+assign wb_ready_go = !hold_flag_wb;
 assign wb_allow_in = !wb_valid || wb_ready_go;
 
 always @(posedge clk)

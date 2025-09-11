@@ -22,13 +22,17 @@
 `include "defines.v"
 
 module mem_stage(
+           // input
            input wire clk,
            input wire rst_n,
            input wire [31: 0] dram_rdo,
            input wire [`EX_TO_MEM_BUS_WIDTH - 1: 0] ex_to_mem_bus,
+           // from controller
+           input wire hold_flag_mem,
            input wire ex_to_mem_valid,
            input wire wb_allow_in,
 
+           // output
            output wire [`MEM_TO_ID_BUS_WIDTH - 1: 0] mem_to_id_bus,
            output wire [`MEM_TO_WB_BUS_WIDTH - 1: 0] mem_to_wb_bus,
            output wire mem_allow_in,
@@ -70,8 +74,8 @@ assign {
 // output bus
 reg [31: 0] wb_data;
 assign mem_to_wb_bus = {  // 38 bits
-           rf_we,        // 1 bit
-           wb_reg,       // 5 bits
+           rf_we,         // 1 bit
+           wb_reg,        // 5 bits
            wb_data      // 32 bits
        };
 
@@ -79,7 +83,7 @@ assign mem_to_wb_bus = {  // 38 bits
 reg mem_valid;
 wire mem_ready_go;
 
-assign mem_ready_go = 1;
+assign mem_ready_go = !hold_flag_mem;
 assign mem_allow_in = !mem_valid || (mem_ready_go && wb_allow_in);
 assign mem_to_wb_valid = mem_valid && mem_ready_go;
 
@@ -123,9 +127,9 @@ end
 
 // bypass
 assign mem_to_id_bus = {  // 39 bits
-           mem_valid,                 // 1 bit
-           rf_we,                    // 1 bit
-           wb_reg,                // 5 bits
+           mem_valid,                  // 1 bit
+           rf_we,                     // 1 bit
+           wb_reg,                 // 5 bits
            wb_data      // 32 bits
        };
 
