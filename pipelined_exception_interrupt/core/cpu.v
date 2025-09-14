@@ -24,8 +24,19 @@
 module cpu #(
            parameter IROM_FILE = "IROM.hex"
        )(
+           // input
            input wire clk,
-           input wire rst_n
+           input wire rst_n,
+           // from sys_bus
+           input wire sys_bus_rdata,
+           input wire int_flag_i,
+
+           // output
+           // to sys_bus
+           output wire sys_bus_request,
+           output wire sys_bus_we,
+           output wire [31: 0] sys_bus_adr,
+           output wire [31: 0] sys_bus_wdata
        );
 
 // from if_stage
@@ -39,6 +50,7 @@ wire [`ID_TO_EX_BUS_WIDTH - 1: 0] id_to_ex_bus;
 wire [11: 0] csr_raddr;
 wire [`EXC_STATUS_WIDTH - 1: 0] exc_status;
 wire [31: 0] inst_addr;
+wire int_flag;
 wire id_allow_in;
 wire id_to_ex_valid;
 
@@ -54,6 +66,7 @@ wire [11: 0] csr_waddr;
 wire [31: 0] csr_wdata;
 wire br_taken_to_controller;
 wire [31: 0] br_target_to_controller;
+wire ram_request_o;
 wire ex_allow_in;
 wire ex_to_mem_valid;
 
@@ -97,6 +110,9 @@ wire [31: 0] irom_inst;
 // from dram
 wire [31: 0] dram_rdo;
 
+// from sys_bus
+wire [31: 0] mem_rdata;
+
 if_stage if_stage_inst (
              // input
              .clk(clk),
@@ -105,6 +121,8 @@ if_stage if_stage_inst (
              .br_taken(br_taken_from_controller),
              .br_target(br_target_from_controller),
              .hold_flag_if(hold_flag_if),
+             // from sys_bus
+             .int_flag_i(int_flag_i),
              .id_allow_in(id_allow_in),
 
              // output
@@ -136,6 +154,7 @@ id_stage id_stage_inst(
              // to clint
              .exc_status_o(exc_status),
              .inst_addr(inst_addr),
+             .int_flag(int_flag),
              .id_allow_in(id_allow_in),
              .id_to_ex_valid(id_to_ex_valid)
          );
@@ -167,6 +186,8 @@ ex_stage ex_stage_inst(
              // to controller
              .br_taken_o(br_taken_to_controller),
              .br_target_o(br_target_to_controller),
+             // to sys_bus
+             .ram_request_o(ram_request_o),
              .ex_allow_in(ex_allow_in),
              .ex_to_mem_valid(ex_to_mem_valid)
          );
@@ -252,6 +273,8 @@ clint clint_inst(
           // from id_stage
           .exc_status(exc_status),
           .inst_addr_i(inst_addr),
+          .int_flag(int_flag),
+          // from ex_stage
           .br_taken(br_taken_to_controller),
           .br_target(br_target_to_controller),
           // from csr
@@ -293,5 +316,12 @@ dram dram_inst(
          // output
          .rdo(dram_rdo)
      );
+
+// sys_bus
+assign sys_bus_request = (int_assert == `TRUE || (sys_bus_adr[31: 28] == 4'h0)) ? `FALSE : ram_request_o;
+assign sys_bus_we = dram_we;
+assign sys_bus_adr = dram_adr;
+assign sys_bus_wdata = dram_wdin;
+assign mem_rdata = (sys_bus_adr[31: 28] == 4'h0) ? dram_rdo : sys_bus_rdata;
 
 endmodule

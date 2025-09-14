@@ -29,6 +29,8 @@ module if_stage(
            input wire br_taken,
            input wire [31: 0] br_target,
            input wire hold_flag_if,
+           // from sys_bus
+           input wire int_flag_i,
            input wire id_allow_in,
 
            // output
@@ -41,7 +43,7 @@ module if_stage(
 // output bus
 wire [31: 0] pc;
 wire [31: 0] pc4;
-assign if_to_id_bus = {pc4, pc};  // 64 bits
+assign if_to_id_bus = {pc4, pc, int_flag_i};  // 65 bits
 
 assign pc4 = pc + 4;
 

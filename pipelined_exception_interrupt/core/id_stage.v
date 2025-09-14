@@ -47,6 +47,7 @@ module id_stage(
            // to clint
            output wire [`EXC_STATUS_WIDTH - 1: 0] exc_status_o,
            output wire [31: 0] inst_addr,
+           output wire int_flag,
            output wire id_allow_in,
            output wire id_to_ex_valid
        );
@@ -58,6 +59,7 @@ assign inst = irom_inst;
 // decoder signals
 wire [`SEXT_OP_WIDTH - 1: 0] sext_op;
 wire [`NPC_OP_WIDTH - 1: 0] npc_op;
+wire ram_request;
 wire ram_we;
 wire [`RAM_W_OP_WIDTH - 1: 0] ram_w_op;
 wire [`MEM_EXT_OP_WIDTH - 1: 0] mem_ext_op;
@@ -87,7 +89,7 @@ end
 
 wire [31: 0] pc;
 wire [31: 0] pc4;
-assign {pc4, pc} = id_regs;
+assign {pc4, pc, int_flag} = id_regs;
 
 wire wb_valid;
 wire wb_rf_we;
@@ -105,29 +107,30 @@ wire [31: 0] rD2_final;
 wire [`CSR_ADDRESS_WIDTH - 1: 0] csr_waddr;
 reg [31: 0] csr_wdata;
 wire [`CSR_WDATA_OP_WIDTH - 1: 0] csr_wdata_op;
-assign id_to_ex_bus = {  // 328 bits
-           npc_op,                           // 2 bits
-           ram_we,                           // 1 bit
-           ram_w_op,                         // 2 bits
-           mem_ext_op,                       // 3 bits
-           alu_op,                           // 4 bits
-           alu_f_op,                         // 3 bits
-           id_rf_we,                         // 1 bit
-           rf_wsel,                          // 3 bits
-           pc4,                              // 32 bits
-           pc,                               // 32 bits
-           ext,                              // 32 bits
-           rD1_final,                       // 32 bits
-           wb_reg_first,                    // 5 bits
-           alu_a,                           // 32 bits
-           alu_b,                           // 32 bits
-           rD2_final,                       // 32 bits
-           is_load,                         // 1 bit
+assign id_to_ex_bus = {  // 329 bits
+           npc_op,                             // 2 bits
+           ram_request,                        // 1 bit
+           ram_we,                             // 1 bit
+           ram_w_op,                           // 2 bits
+           mem_ext_op,                         // 3 bits
+           alu_op,                             // 4 bits
+           alu_f_op,                           // 3 bits
+           id_rf_we,                           // 1 bit
+           rf_wsel,                            // 3 bits
+           pc4,                                // 32 bits
+           pc,                                 // 32 bits
+           ext,                                // 32 bits
+           rD1_final,                         // 32 bits
+           wb_reg_first,                      // 5 bits
+           alu_a,                             // 32 bits
+           alu_b,                             // 32 bits
+           rD2_final,                         // 32 bits
+           is_load,                           // 1 bit
            // csr
-           csr_rdata,                       // 32 bits
-           csr_we,                           // 1 bit
-           csr_waddr,                       // 12 bits
-           csr_wdata,                       // 32 bits
+           csr_rdata,                         // 32 bits
+           csr_we,                             // 1 bit
+           csr_waddr,                         // 12 bits
+           csr_wdata,                         // 32 bits
            csr_wdata_op       // 2 bits
        };
 
@@ -164,6 +167,7 @@ decoder decoder_inst(
 
             .sext_op(sext_op),
             .npc_op(npc_op),
+            .ram_request(ram_request),
             .ram_we(ram_we),
             .ram_w_op(ram_w_op),
             .mem_ext_op(mem_ext_op),
