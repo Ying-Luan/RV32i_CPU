@@ -6,4 +6,6 @@
 #define TIMER_COUNT (TIMER_BASE + (0x04))
 #define TIMER_VALUE (TIMER_BASE + (0x08))
 
+#define TIMER_REG(addr) (*((volatile uint32_t *)addr))
+
 #endif
