@@ -19,7 +19,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-`include "defines.v"
+`include "../defines.v"
 
 module decoder(
            input wire [31: 0] inst,
@@ -223,7 +223,7 @@ begin
                     mem_ext_op = `MEM_EXT_H;
                 3'b101:
                     mem_ext_op = `MEM_EXT_HU;
-                3'b010:                      // lw
+                3'b010:                       // lw
                     mem_ext_op = `MEM_EXT_W;
                 default:
                 begin

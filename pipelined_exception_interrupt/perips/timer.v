@@ -14,18 +14,29 @@ module timer (
            // output
            // to sys_bus
            output reg [31: 0] timer_rdata,
-           output wire int_sig
+           output wire int_sig_o
        );
 
 // [0]: timer enable
 // [1]: timer interrupt enable
-// [2]: timer interrupt pending
+// [2]: timer interrupt pending, wirite 1 to clear
 reg [31: 0] timer_ctrl;
 // timer current count
 reg [31: 0] timer_count;
 reg [31: 0] timer_value;
 
+wire int_sig;
 assign int_sig = ((timer_ctrl[2] == `TRUE) && (timer_ctrl[1] == `TRUE)) ? `TRUE : `FALSE;
+pulse_one_cycle #(
+                    .WIDTH(1),
+                    .IDLE_VALUE(`FALSE)
+                ) pulse_one_cycle_inst (
+                    .clk(clk),
+                    .rst_n(rst_n),
+                    .enable((timer_ctrl[2] == `TRUE) && (timer_ctrl[1] == `TRUE)),
+                    .data(int_sig),
+                    .data_o(int_sig_o)
+                );
 
 // counter
 always @(posedge clk)

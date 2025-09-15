@@ -28,7 +28,7 @@ module cpu #(
            input wire clk,
            input wire rst_n,
            // from sys_bus
-           input wire sys_bus_rdata,
+           input wire [31: 0] sys_bus_rdata,
            input wire int_flag_i,
 
            // output
@@ -112,6 +112,7 @@ wire [31: 0] dram_rdo;
 
 // from sys_bus
 wire [31: 0] mem_rdata;
+reg [31: 0] sys_bus_rdata_o;
 
 if_stage if_stage_inst (
              // input
@@ -196,7 +197,7 @@ mem_stage mem_stage_inst(
               // input
               .clk(clk),
               .rst_n(rst_n),
-              .dram_rdo(dram_rdo),
+              .dram_rdo(mem_rdata),
               .ex_to_mem_bus(ex_to_mem_bus),
               // from controller
               .hold_flag_mem(hold_flag_mem),
@@ -322,6 +323,10 @@ assign sys_bus_request = (int_assert == `TRUE || (sys_bus_adr[31: 28] == 4'h0)) 
 assign sys_bus_we = dram_we;
 assign sys_bus_adr = dram_adr;
 assign sys_bus_wdata = dram_wdin;
-assign mem_rdata = (sys_bus_adr[31: 28] == 4'h0) ? dram_rdo : sys_bus_rdata;
+assign mem_rdata = (sys_bus_adr[31: 28] == 4'h0) ? dram_rdo : sys_bus_rdata_o;
+always @(posedge clk)
+begin
+    sys_bus_rdata_o <= sys_bus_rdata;
+end
 
 endmodule

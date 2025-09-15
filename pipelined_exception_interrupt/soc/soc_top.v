@@ -57,7 +57,7 @@ timer timer_inst(
           // output
           // to sys_bus
           .timer_rdata(slave1_rdata),
-          .int_sig(int_flag_timer)
+          .int_sig_o(int_flag_timer)
       );
 
 sys_bus sys_bus_inst(
