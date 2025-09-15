@@ -1,15 +1,13 @@
 # RV32i CPU 单周期以及流水线实现
 
-> 基础单周期与流水线实现文档见 [旧版文档入口](./README_old.md)
-
-基于 `Verilog` 语言实现，目前共支持 `RV32i` 的45条指令和特权指令集的1条指令，支持部分异常和中断处理
+基于 `Verilog` 语言实现，目前共支持 `miniRV` 的37条指令
 
 包括：
 
 * R 型指令 10 条  
   `add`, `sub`, `and`, `or`, `xor`, `sll`, `srl`, `sra`, `slt`, `sltu`
-* I 型指令 23 条  
-  `addi`, `andi`, `ori`, `xori`, `slli`, `srli`, `srai`, `slti`, `sltiu`, `lb`, `lbu`, `lh`, `lhu`, `lw`, `jalr`, `ecall`, `ebreak`, `csrrw`, `csrrs`, `csrrc`, `csrrwi`, `csrrsi`, `csrrci`
+* I 型指令 15 条  
+  `addi`, `andi`, `ori`, `xori`, `slli`, `srli`, `srai`, `slti`, `sltiu`, `lb`, `lbu`, `lh`, `lhu`, `lw`, `jalr`
 * S 型指令 3 条  
   `sb`, `sh`, `sw`
 * B 型指令 6 条  
@@ -18,10 +16,8 @@
   `lui`, `auipc`
 * J 型指令 1 条  
   `jal`
-* 特权指令 1 条  
-  `mret`
 
-<!-- ## 架构设计图
+## 架构设计图
 
 ### 单周期
 
@@ -41,9 +37,9 @@
 
 注：
 
-* 流水线CPU由于涉及到数据冒险和控制冒险的处理，基本架构仅供前期划分流水线参考，实际效果为顶层架构设计图所示 -->
+* 流水线CPU由于涉及到数据冒险和控制冒险的处理，基本架构仅供前期划分流水线参考，实际效果为顶层架构设计图所示
 
-<!-- ## 仿真测试
+## 仿真测试
 
 |汇编代码文件|机器码文件|功能描述|预期结果|单周期测试结果|流水线测试结果|
 |:---:|:---:|:---:|:---:|:---:|:---:|
@@ -54,7 +50,7 @@
 
 注：
 
-* 由于 `rars` 工具的原因，有关 pc 的部分代码写入寄存器的值相比于仿真的实际结果大 `0x00003000` -->
+* 由于 `rars` 工具的原因，有关 pc 的部分代码写入寄存器的值相比于仿真的实际结果大 `0x00003000`
 
 ## 项目目录
 
@@ -62,23 +58,12 @@
 |:---:|:---:|
 |`docs/`|存放图片|
 |`pipelined/`|存放流水线CPU代码|
-|`pipelined_exception_interrupt/`|存放实现了异常和中断的流水线CPU代码|
 |`single_cycle/`|存放单周期CPU代码|
 |`test/`|存放测试文件|
-|`convert.py`|将汇编代码转换为机器码的脚本|
-|`README_old.md`|旧版文档|
 |`README.md`|项目说明文件|
 
-## 相关工具
-
-* [改善 verilog 编写环境的插件们](https://mp.weixin.qq.com/s/_Un7dbGjhJR90ILFQd-HrA)
-* [rars](https://github.com/TheThirdOne/rars)
-* [Prebuilt Windows Toolchain for RISC-V](https://gnutoolchains.com/risc-v/)
-* Vivado 2020.2
-
-## 参考
+## 参考视频和代码
 
 * [[HIT COA] 32位流水线CPU的设计与实践——Verilog实现](https://www.bilibili.com/video/BV1xzBHYgE3c)
 * [Project-Pipeline](https://github.com/FlyMachinee/project-pipeline)
 * [Accomdemy RV32I CPU](https://github.com/accomdemy/accomdemy_rv32i)
-* [tinyriscv](https://gitee.com/liangkangnan/tinyriscv)
