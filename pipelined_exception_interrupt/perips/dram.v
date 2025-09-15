@@ -19,15 +19,18 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-`include "defines.v"
-
+`include "../core/defines.v" 
+// TODO: op
 module dram(
+           // input
            input wire clk,
+           input wire rst_n,
            input wire [31: 0] adr,
            input wire [1: 0] op,
            input wire we,
            input wire [31: 0] wdin,
 
+           // output
            output reg [31: 0] rdo
        );
 localparam MEM_DEPTH = 10;
@@ -70,8 +73,20 @@ begin
 end
 
 // read
-always @(posedge clk)
+// sync
+// always @(posedge clk)
+// begin
+//     rdo <= {mem[adr + 3], mem[adr + 2], mem[adr + 1], mem[adr]};
+// end
+
+// read
+// async
+always @( * )
 begin
-    rdo <= {mem[adr + 3], mem[adr + 2], mem[adr + 1], mem[adr]};
+    if (~rst_n)
+        rdo <= 32'b0;
+    else
+        rdo <= {mem[adr + 3], mem[adr + 2], mem[adr + 1], mem[adr]};
 end
+
 endmodule

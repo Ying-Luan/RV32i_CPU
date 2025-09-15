@@ -36,7 +36,8 @@ module cpu #(
            output wire sys_bus_request,
            output wire sys_bus_we,
            output wire [31: 0] sys_bus_adr,
-           output wire [31: 0] sys_bus_wdata
+           output wire [31: 0] sys_bus_wdata,
+           output wire [`RAM_W_OP_WIDTH - 1: 0] dram_w_op
        );
 
 // from if_stage
@@ -55,10 +56,6 @@ wire id_allow_in;
 wire id_to_ex_valid;
 
 // from ex_stage
-wire [31: 0] dram_adr;
-wire [1: 0] dram_w_op;
-wire dram_we;
-wire [31: 0] dram_wdin;
 wire [`EX_TO_ID_BUS_WIDTH - 1: 0] ex_to_id_bus;
 wire [`EX_TO_MEM_BUS_WIDTH - 1: 0] ex_to_mem_bus;
 wire csr_we;
@@ -111,7 +108,6 @@ wire [31: 0] irom_inst;
 wire [31: 0] dram_rdo;
 
 // from sys_bus
-wire [31: 0] mem_rdata;
 reg [31: 0] sys_bus_rdata_o;
 
 if_stage if_stage_inst (
@@ -174,10 +170,10 @@ ex_stage ex_stage_inst(
              .int_addr(int_addr),
 
              // output
-             .dram_adr(dram_adr),
+             .dram_adr(sys_bus_adr),
              .dram_w_op(dram_w_op),
-             .dram_we(dram_we),
-             .dram_wdin(dram_wdin),
+             .dram_we(sys_bus_we),
+             .dram_wdin(sys_bus_wdata),
              .ex_to_id_bus(ex_to_id_bus),
              .ex_to_mem_bus(ex_to_mem_bus),
              // to csr
@@ -197,7 +193,7 @@ mem_stage mem_stage_inst(
               // input
               .clk(clk),
               .rst_n(rst_n),
-              .dram_rdo(mem_rdata),
+              .dram_rdo(sys_bus_rdata_o),
               .ex_to_mem_bus(ex_to_mem_bus),
               // from controller
               .hold_flag_mem(hold_flag_mem),
@@ -306,24 +302,8 @@ irom #(
          .inst(irom_inst)
      );
 
-dram dram_inst(
-         // input
-         .clk(clk),
-         .adr(dram_adr),
-         .op(dram_w_op),
-         .we(dram_we),
-         .wdin(dram_wdin),
-
-         // output
-         .rdo(dram_rdo)
-     );
-
 // sys_bus
-assign sys_bus_request = (int_assert == `TRUE || (sys_bus_adr[31: 28] == 4'h0)) ? `FALSE : ram_request_o;
-assign sys_bus_we = dram_we;
-assign sys_bus_adr = dram_adr;
-assign sys_bus_wdata = dram_wdin;
-assign mem_rdata = (sys_bus_adr[31: 28] == 4'h0) ? dram_rdo : sys_bus_rdata_o;
+assign sys_bus_request = (int_assert == `TRUE) ? `FALSE : ram_request_o;
 always @(posedge clk)
 begin
     sys_bus_rdata_o <= sys_bus_rdata;

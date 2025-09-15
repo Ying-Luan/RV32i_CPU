@@ -102,27 +102,40 @@ begin
                   soc_top_inst.timer_inst.timer_value,
                   soc_top_inst.timer_inst.int_sig
                  );
-         $display("[timer_ctrl] timer_wdata=%h, timer_we=%b, alu.A=%h, alu.B=%h, id_stage.rD1_final=%h, id_stage.mem_rf_data=%h, mem_stage.wb_data=%h, cpu.mem_rdata=%h, cpu.sys_bus_rdata=%h, cpu.sys_bus_request=%b",
-                  soc_top_inst.timer_inst.timer_wdata,
-                  soc_top_inst.timer_inst.timer_we,
-                  soc_top_inst.cpu_inst.ex_stage_inst.alu_inst.A,
-                  soc_top_inst.cpu_inst.ex_stage_inst.alu_inst.B,
-                  soc_top_inst.cpu_inst.id_stage_inst.rD1_final,
-                  soc_top_inst.cpu_inst.id_stage_inst.mem_rf_data,
-                  soc_top_inst.cpu_inst.mem_stage_inst.wb_data,
-                  soc_top_inst.cpu_inst.mem_rdata,
-                  soc_top_inst.cpu_inst.sys_bus_rdata,
-                  soc_top_inst.cpu_inst.sys_bus_request
+         $display("[dram] sys_bus_we=%b, sys_bus_adr=%h, sys_bus_wdata=%h, sys_bus_rdata=%h",
+                  soc_top_inst.cpu_inst.sys_bus_we,
+                  soc_top_inst.cpu_inst.sys_bus_adr,
+                  soc_top_inst.cpu_inst.sys_bus_wdata,
+                  soc_top_inst.cpu_inst.sys_bus_rdata
                  );
-         $display("[timer_ctrl] timer.rdata=%h, mem_stage.dram_rdo=%h",
-                  soc_top_inst.timer_inst.timer_rdata,
-                  soc_top_inst.cpu_inst.mem_stage_inst.dram_rdo
+         $display("[dram] adr=%h, op=%h, we=%b, wdin=%h, rdo=%h",
+                  soc_top_inst.dram_inst.adr,
+                  soc_top_inst.dram_inst.op,
+                  soc_top_inst.dram_inst.we,
+                  soc_top_inst.dram_inst.wdin,
+                  soc_top_inst.dram_inst.rdo
                  );
-         $display("[x5] wb_stage.wb_data=%h, wb_stage.wb_reg=%d, wb_stage.rf_en=%b",
-                  soc_top_inst.cpu_inst.wb_stage_inst.wb_data,
-                  soc_top_inst.cpu_inst.wb_stage_inst.wb_reg,
-                  soc_top_inst.cpu_inst.wb_stage_inst.rf_en
-                 );
+         //  $display("[timer_ctrl] timer_wdata=%h, timer_we=%b, alu.A=%h, alu.B=%h, id_stage.rD1_final=%h, id_stage.mem_rf_data=%h, mem_stage.wb_data=%h, cpu.mem_rdata=%h, cpu.sys_bus_rdata=%h, cpu.sys_bus_request=%b",
+         //           soc_top_inst.timer_inst.timer_wdata,
+         //           soc_top_inst.timer_inst.timer_we,
+         //           soc_top_inst.cpu_inst.ex_stage_inst.alu_inst.A,
+         //           soc_top_inst.cpu_inst.ex_stage_inst.alu_inst.B,
+         //           soc_top_inst.cpu_inst.id_stage_inst.rD1_final,
+         //           soc_top_inst.cpu_inst.id_stage_inst.mem_rf_data,
+         //           soc_top_inst.cpu_inst.mem_stage_inst.wb_data,
+         //           soc_top_inst.cpu_inst.mem_rdata,
+         //           soc_top_inst.cpu_inst.sys_bus_rdata,
+         //           soc_top_inst.cpu_inst.sys_bus_request
+         //          );
+         //  $display("[timer_ctrl] timer.rdata=%h, mem_stage.dram_rdo=%h",
+         //           soc_top_inst.timer_inst.timer_rdata,
+         //           soc_top_inst.cpu_inst.mem_stage_inst.dram_rdo
+         //          );
+         //  $display("[x5] wb_stage.wb_data=%h, wb_stage.wb_reg=%d, wb_stage.rf_en=%b",
+         //           soc_top_inst.cpu_inst.wb_stage_inst.wb_data,
+         //           soc_top_inst.cpu_inst.wb_stage_inst.wb_reg,
+         //           soc_top_inst.cpu_inst.wb_stage_inst.rf_en
+         //          );
          //  $display("[Á÷Ë®Ïß] IF_VALID=%b,    ID_VALID=%b,    EX_VALID=%b,    MEM_VALID=%b,    WB_VALID=%b",
          //           soc_top_inst.cpu_inst.if_stage_inst.if_valid,
          //           soc_top_inst.cpu_inst.id_stage_inst.id_valid,
