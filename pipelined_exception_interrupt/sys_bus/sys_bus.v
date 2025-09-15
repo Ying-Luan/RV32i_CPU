@@ -38,7 +38,7 @@ module sys_bus (
        );
 
 localparam REQUEST_WIDTH = 4;
-localparam REQUEST0 = 4'b0001;
+localparam REQUEST0 = 4'b0000;
 localparam REQUEST1 = 4'b0010;
 
 localparam GRANT_WIDTH = 1;
