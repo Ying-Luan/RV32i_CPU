@@ -48,6 +48,8 @@ module ex_stage (
            // to controller
            output wire br_taken_o,
            output wire [31: 0] br_target_o,
+           // to sys_bus
+           output wire ram_request_o,
            output wire ex_allow_in,
            output wire ex_to_mem_valid
        );
@@ -66,6 +68,7 @@ begin
 end
 
 wire [ 1: 0] npc_op;
+wire ram_request;
 wire ram_we;
 wire [ 1: 0] ram_w_op;
 wire [`MEM_EXT_OP_WIDTH - 1: 0] mem_ext_op;
@@ -87,6 +90,7 @@ wire [31: 0] csr_wdata;
 wire [ 1: 0] csr_wdata_op;
 assign {
         npc_op,
+        ram_request,
         ram_we,
         ram_w_op,
         mem_ext_op,
@@ -113,13 +117,13 @@ assign {
 
 wire [31: 0] alu_c;
 assign ex_to_mem_bus = {  // 140 bits
-           mem_ext_op,                           // 3 bits
-           rf_we,                                // 1 bit
-           rf_wsel,                              // 3 bits
-           pc4,                                  // 32 bits
-           ext,                                  // 32 bits
-           wb_reg,                               // 5 bits
-           alu_c,                                // 32 bits
+           mem_ext_op,                            // 3 bits
+           rf_we,                                 // 1 bit
+           rf_wsel,                               // 3 bits
+           pc4,                                   // 32 bits
+           ext,                                   // 32 bits
+           wb_reg,                                // 5 bits
+           alu_c,                                 // 32 bits
            // csr
            csr_rdata            // 32 bits
        };
@@ -181,6 +185,7 @@ alu alu_inst (
 // DRAM
 assign dram_adr = alu_c;
 assign dram_w_op = ram_w_op;
+assign ram_request_o = ex_valid && ram_request;
 assign dram_we = ex_valid && ram_we;
 assign dram_wdin = rD2;
 
@@ -219,10 +224,10 @@ begin
     endcase
 end
 assign ex_to_id_bus = {  // 40 bits
-           ex_valid,                                                                    // 1 bit
-           rf_we,                                                                       // 1 bit
-           wb_reg,                                                                      // 5 bits
-           rf_wdata,                                                                    // 32 bits
+           ex_valid,                                                                     // 1 bit
+           rf_we,                                                                        // 1 bit
+           wb_reg,                                                                       // 5 bits
+           rf_wdata,                                                                     // 32 bits
            is_load                                                              // 1 bit
        };
 

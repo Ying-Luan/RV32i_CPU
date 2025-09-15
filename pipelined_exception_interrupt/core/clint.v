@@ -9,6 +9,7 @@ module clint (
            // from id_stage
            input wire [`EXC_STATUS_WIDTH - 1: 0] exc_status,
            input wire [31: 0] inst_addr_i,
+           input wire int_flag,
            // from ex_stage
            input wire br_taken,
            input wire [31: 0] br_target,
@@ -16,7 +17,7 @@ module clint (
            input wire [31: 0] csr_mtvec,
            input wire [31: 0] csr_mepc,
            input wire [31: 0] csr_mstatus,
-           input wire global_interrupt_enable,      // TODO: wait for use
+           input wire global_interrupt_enable,
 
            // output
            output wire hold_flag,
@@ -33,7 +34,8 @@ module clint (
 localparam INT_STATE_WIDTH = 2;
 localparam INT_STATE_IDLE = 2'b00;
 localparam INT_STATE_SYNC_ASSERT = 2'b01;
-localparam INT_STATE_MRET = 2'b10;
+localparam INT_STATE_ASYNC_ASSERT = 2'b10;
+localparam INT_STATE_MRET = 2'b11;
 
 // csr_state
 localparam CSR_STATE_WIDTH = 3;
@@ -59,6 +61,8 @@ begin
     begin
         if (exc_status == `EXC_STATUS_ECALL || exc_status == `EXC_STATUS_EBREAK)
             int_state = INT_STATE_SYNC_ASSERT;
+        else if (int_flag != `INT_NONE && global_interrupt_enable == `TRUE)
+            int_state = INT_STATE_ASYNC_ASSERT;
         else if (exc_status == `EXC_STATUS_MRET)
             int_state = INT_STATE_MRET;
         else
@@ -82,6 +86,7 @@ begin
         case (csr_state)
             CSR_STATE_IDLE:
             begin  // initialize
+                // sync int
                 if (int_state == INT_STATE_SYNC_ASSERT)
                 begin
                     csr_state <= CSR_STATE_MEPC;
@@ -93,11 +98,22 @@ begin
                         default:
                             cause <= {1'b0, 31'd10};
                     endcase
-                    if (br_taken)
+                    if (br_taken == `TRUE)
                         inst_addr <= br_target - 32'd4;
                     else
                         inst_addr <= inst_addr_i;
                 end
+                // async int
+                else if (int_state == INT_STATE_ASYNC_ASSERT)
+                begin
+                    cause <= {1'b1, 31'd7};
+                    csr_state <= CSR_STATE_MEPC;
+                    if (br_taken == `TRUE)
+                        inst_addr <= br_target;
+                    else
+                        inst_addr <= inst_addr_i;
+                end
+                // mret
                 else if (int_state == INT_STATE_MRET)
                 begin
                     csr_state <= CSR_STATE_MRET;

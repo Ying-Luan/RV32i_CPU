@@ -19,7 +19,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-`include "defines.v"
+`include "../defines.v"
 
 module decoder(
            input wire [31: 0] inst,
@@ -29,6 +29,7 @@ module decoder(
            // npc
            output reg [`NPC_OP_WIDTH - 1: 0] npc_op,
            // ram
+           output reg ram_request,
            output reg ram_we,
            output reg [`RAM_W_OP_WIDTH - 1: 0] ram_w_op,
            output reg [`MEM_EXT_OP_WIDTH - 1: 0] mem_ext_op,
@@ -69,6 +70,7 @@ begin
     // default
     sext_op = `EXT_I;
     npc_op = `NPC_PC4;
+    ram_request = `FALSE;
     ram_we = `CLOSE;
     ram_w_op = `W_B;
     mem_ext_op = `MEM_EXT_B;
@@ -208,6 +210,7 @@ begin
             alu_b_sel = `ALU_B_EXT;
             rd1_en = `ENABLE;
             rd2_en = `DISABLE;
+            ram_request = `TRUE;
             ram_we = `CLOSE;
             is_load = `OPEN;
 
@@ -220,7 +223,7 @@ begin
                     mem_ext_op = `MEM_EXT_H;
                 3'b101:
                     mem_ext_op = `MEM_EXT_HU;
-                3'b010:                   // lw
+                3'b010:                       // lw
                     mem_ext_op = `MEM_EXT_W;
                 default:
                 begin
@@ -233,6 +236,7 @@ begin
                     alu_b_sel = `ALU_B_RS2;
                     rd1_en = `DISABLE;
                     rd2_en = `DISABLE;
+                    ram_request = `FALSE;
                     ram_we = `CLOSE;
                     is_load = `CLOSE;
 
@@ -326,6 +330,7 @@ begin
             alu_b_sel = `ALU_B_EXT;
             rd1_en = `ENABLE;
             rd2_en = `ENABLE;
+            ram_request = `TRUE;
             ram_we = `OPEN;
 
             case (funct3)
@@ -345,6 +350,7 @@ begin
                     alu_b_sel = `ALU_B_RS2;
                     rd1_en = `DISABLE;
                     rd2_en = `DISABLE;
+                    ram_request = `FALSE;
                     ram_we = `CLOSE;
 
                     invalid_instruction = `TRUE;
